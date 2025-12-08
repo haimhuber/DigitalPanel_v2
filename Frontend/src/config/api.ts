@@ -7,8 +7,9 @@ let cachedServerUrl = 'http://localhost:5500';
 // Function to fetch server IP dynamically from the server
 export const initializeServerUrl = async (): Promise<string> => {
     try {
-        // Try to get server IP from the server itself
-        const response = await fetch('http://localhost:5500/api/server-ip');
+        // Use current hostname and protocol for network compatibility
+        const apiUrl = `${window.location.protocol}//${window.location.hostname}:5500/api/server-ip`;
+        const response = await fetch(apiUrl);
         const data = await response.json();
         if (data.status === 200 && data.ip) {
             cachedServerUrl = `http://${data.ip}:${data.port || 5500}`;

@@ -9,8 +9,10 @@ router.get('', (req, res) => {
     res.status(200).json({ Msg: "Hello! Welcome to my api!" });
 });
 router.get('/server-ip', (req, res) => {
-    const serverIp = getLocalIPs();
-    res.status(200).json({ status: 200, ip: serverIp, port: 5500 });
+    const serverIps = getLocalIPs();
+    // Always return a single IP string (first in array if array)
+    const ip = Array.isArray(serverIps) ? serverIps[0] : serverIps;
+    res.status(200).json({ status: 200, ip, port: 5500 });
 });
 router.get('/breakersNames', screenAction.breakersNames);
 router.get('/breakersMainData', screenAction.breakersLiveData);
