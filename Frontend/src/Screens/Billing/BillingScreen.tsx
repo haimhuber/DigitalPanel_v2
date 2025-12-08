@@ -770,7 +770,7 @@ export const BillingScreen = () => {
                   </th>
                   <th>Cost (₪) incl. VAT</th>
                   <th>Season</th>
-                  <th>Peak Rate</th>
+                  <th>Peak Hours</th>
                   <th>Off-Peak Rate</th>
                   <th>Efficiency</th>
                 </tr>
