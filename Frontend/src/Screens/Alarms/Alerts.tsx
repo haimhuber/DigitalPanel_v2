@@ -21,9 +21,13 @@ export const Alerts = () => {
   const [ackDataBy, setAckDataBy] = useState<AckTimestamp[]>([]);
   const { refreshAlerts } = useAlerts();
 
+  // Debug: Check sessionStorage
+  console.log('👤 Current user from sessionStorage:', ackBy);
+
   const readAllAckData = async () => {
     const res = await fetch(API_ENDPOINTS.ackData);
     const req = await res.json();
+    console.log('📊 Ack Data received:', req.data);
     setAckDataBy(req.data);
   };
 
@@ -265,13 +269,18 @@ export const Alerts = () => {
 
       const tableData = sortedAlerts.slice(0, 20).map(alert => {
         const ackTimestamp = ackDataBy.find(item => item.ackId === alert.id)?.timestamp;
+        const ackUser = ackDataBy.find(item => item.ackId === alert.id)?.ackBy;
+        const isCommError = !alert.alert_type || alert.alert_type === 'CommStatus - Error' || alert.alert_type.includes('Comm');
+        const displayType = alert.alert_type || (isCommError ? '📡 Comm Error' : 'Unknown');
+        const displayMessage = alert.alert_message || (isCommError ? 'Communication error detected' : 'No message');
+        
         return [
           names[alert.alarmId - 1]?.name || 'Unknown',
-          alert.alert_type,
-          alert.alert_message,
-          new Date(alert.timestamp).toLocaleDateString(),
-          alert.alertAck ? 'Yes' : 'No',
-          ackTimestamp ? new Date(ackTimestamp).toLocaleString() : '--'
+          displayType,
+          displayMessage,
+          new Date(alert.timestamp).toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem' }),
+          alert.alertAck ? `Yes (${ackUser || 'Unknown'})` : 'No',
+          ackTimestamp ? new Date(ackTimestamp).toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem' }) : '--'
         ];
       });
 
@@ -444,7 +453,7 @@ export const Alerts = () => {
                         </span>
                       </td>
                       <td style={{ maxWidth: '200px', wordWrap: 'break-word' }}>{displayMessage}</td>
-                      <td>{new Date(alert.timestamp).toLocaleString()}</td>
+                      <td>{new Date(alert.timestamp).toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem' })}</td>
                       <td>
                         {alert.alertAck ? (
                           <div className="ack-badge">
@@ -462,7 +471,7 @@ export const Alerts = () => {
                       <td>
                         {alert.alertAck ? (
                           <div className="ack-timestamp">
-                            {ackTimestamp ? new Date(ackTimestamp).toLocaleString() : '--'}
+                            {ackTimestamp ? new Date(ackTimestamp).toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem' }) : '--'}
                           </div>
                         ) : (
                           <button

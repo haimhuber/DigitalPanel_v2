@@ -181,8 +181,8 @@ async function createSp() {
             SET NOCOUNT ON;
 
             -- Get all records from the last 2 days at the current hour
-            DECLARE @TwoDaysAgo DATETIME = DATEADD(DAY, -2, GETDATE());
-            DECLARE @CurrentHour INT = DATEPART(HOUR, GETDATE());
+            DECLARE @TwoDaysAgo DATETIME = DATEADD(DAY, -2, GETUTCDATE());
+            DECLARE @CurrentHour INT = DATEPART(HOUR, GETUTCDATE());
 
             SELECT 
                 ActivePower,
@@ -298,7 +298,7 @@ async function createSp() {
             )
             BEGIN
                 INSERT INTO Alerts (alarmId, alarmType, alarmMessage, alertAck, timestamp)
-                VALUES (@switch_id, @alert_type, @alert_message, 0, GETDATE());
+                VALUES (@switch_id, @alert_type, @alert_message, 0, GETUTCDATE());
             END
         END`);
         console.log("✅ Stored Procedure 'AddProtectionAlert' created successfully");
