@@ -1,6 +1,7 @@
 const startModbusClient = require('./modbusClient/checkConnection');
 const express = require('express');
 const createDatabase = require('./database/createDatabase');
+const { initWebSocketServer } = require('./websocketServer');
 const app = express();
 const bodyparser = require('body-parser');
 const port = 5500;
@@ -45,10 +46,13 @@ createDatabase.createDatabase();
 startModbusClient.start();
 app.use('/api', screenRouters);
 
-app.listen(port, 'localhost', () => {
+const server = app.listen(port, 'localhost', () => {
   console.log(`Server listening at http://localhost:${port}`);
   console.log(`Also available on: http://192.168.1.89:${port}`);
 });
+
+// Initialize WebSocket Server
+initWebSocketServer(server);
 
 
 

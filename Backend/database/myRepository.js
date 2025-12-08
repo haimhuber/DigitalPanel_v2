@@ -1,5 +1,6 @@
 const connectDb = require('./db');
 const sql = require('mssql');
+const { notifyNewAlert, getActiveAlertsCount } = require('../websocketServer');
 const path = require('path');
 const fs = require('fs');
 const { log } = require('console');
@@ -65,6 +66,8 @@ async function writeBreakerData(data, tableIndex) {
 // 🔔 פונקציה לבדיקה והוספת Alerts על בסיס הביטים
 async function checkAndAddAlerts(pool, switchId, bits) {
   try {
+    let alertAdded = false;
+    
     // bits[0] = CommStatus -> 0 = תקלת תקשורת
     if (bits[0] === 0) {
       await pool.request()
@@ -73,6 +76,7 @@ async function checkAndAddAlerts(pool, switchId, bits) {
         .input('alert_message', sql.VarChar(255), `תקלת תקשורת במתג ${switchId}`)
         .execute('AddProtectionAlert');
       console.log(`🚨 Alert added: CommStatus Error on switch ${switchId}`);
+      alertAdded = true;
     }
 
     // bits[11] = Tripped -> 1 = המפסק נותק
@@ -83,6 +87,7 @@ async function checkAndAddAlerts(pool, switchId, bits) {
         .input('alert_message', sql.VarChar(255), `המפסק ${switchId} נותק בגלל תקלה`)
         .execute('AddProtectionAlert');
       console.log(`🚨 Alert added: Tripped on switch ${switchId}`);
+      alertAdded = true;
     }
 
     // bits[1] = ProtectionTrip -> 1 = תקלת הגנה כללית
@@ -93,6 +98,7 @@ async function checkAndAddAlerts(pool, switchId, bits) {
         .input('alert_message', sql.VarChar(255), `תקלת הגנה במתג ${switchId}`)
         .execute('AddProtectionAlert');
       console.log(`🚨 Alert added: ProtectionTrip on switch ${switchId}`);
+      alertAdded = true;
     }
 
     // bits[7] = ProtectionI_Trip -> 1 = תקלת זרם יתר
@@ -103,6 +109,7 @@ async function checkAndAddAlerts(pool, switchId, bits) {
         .input('alert_message', sql.VarChar(255), `תקלת זרם יתר במתג ${switchId}`)
         .execute('AddProtectionAlert');
       console.log(`🚨 Alert added: ProtectionI_Trip on switch ${switchId}`);
+      alertAdded = true;
     }
 
     // bits[8] = ProtectionS_Trip -> 1 = תקלת קצר
@@ -113,6 +120,7 @@ async function checkAndAddAlerts(pool, switchId, bits) {
         .input('alert_message', sql.VarChar(255), `תקלת קצר במתג ${switchId}`)
         .execute('AddProtectionAlert');
       console.log(`🚨 Alert added: ProtectionS_Trip on switch ${switchId}`);
+      alertAdded = true;
     }
 
     // bits[9] = ProtectionL_Trip -> 1 = תקלת עומס יתר
@@ -123,6 +131,7 @@ async function checkAndAddAlerts(pool, switchId, bits) {
         .input('alert_message', sql.VarChar(255), `תקלת עומס יתר במתג ${switchId}`)
         .execute('AddProtectionAlert');
       console.log(`🚨 Alert added: ProtectionL_Trip on switch ${switchId}`);
+      alertAdded = true;
     }
 
     // bits[6] = ProtectionG_Trip -> 1 = תקלת הגנת קרקע
@@ -133,6 +142,13 @@ async function checkAndAddAlerts(pool, switchId, bits) {
         .input('alert_message', sql.VarChar(255), `תקלת הגנת קרקע במתג ${switchId}`)
         .execute('AddProtectionAlert');
       console.log(`🚨 Alert added: ProtectionG_Trip on switch ${switchId}`);
+      alertAdded = true;
+    }
+
+    // If any alert was added, notify WebSocket clients
+    if (alertAdded) {
+      const alertsCount = await getActiveAlertsCount(pool);
+      notifyNewAlert(alertsCount);
     }
 
   } catch (err) {
@@ -866,4 +882,9 @@ async function updateBreakerInfo(id, name, type, load, updatedBy) {
   }
 }
 
-module.exports = { auditTrailData, AuditTrail, breakerSwtichStatus, reportPowerData, readAllAckData, writeBreakerData, getActivePower, getBreakersMainData, getBreakersNames, getActiveEnergy, addUser, userExist, getAlertData, akcAlert, akcAlertBy, getBatchActivePower, getBatchActiveEnergy, getConsumptionBilling, checkDataExists, updateLiveData, clearLiveData, getLiveDataOnly, getHourlySamples, getDailySamples, getWeeklySamples, getUsers, getUserById, getUserByEmail, updateUserPassword, deleteUser, getTariffRates, updateTariffRate, updateTariffRatesOnly, updateEfficiencySettings, getBreakerInfo, updateBreakerInfo };
+// Export pool getter
+async function getPool() {
+  return await connectDb.connectionToSqlDB();
+}
+
+module.exports = { getPool, auditTrailData, AuditTrail, breakerSwtichStatus, reportPowerData, readAllAckData, writeBreakerData, getActivePower, getBreakersMainData, getBreakersNames, getActiveEnergy, addUser, userExist, getAlertData, akcAlert, akcAlertBy, getBatchActivePower, getBatchActiveEnergy, getConsumptionBilling, checkDataExists, updateLiveData, clearLiveData, getLiveDataOnly, getHourlySamples, getDailySamples, getWeeklySamples, getUsers, getUserById, getUserByEmail, updateUserPassword, deleteUser, getTariffRates, updateTariffRate, updateTariffRatesOnly, updateEfficiencySettings, getBreakerInfo, updateBreakerInfo };

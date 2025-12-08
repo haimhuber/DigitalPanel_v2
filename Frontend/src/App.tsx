@@ -22,6 +22,12 @@ function AppContent() {
   const location = useLocation();
   const [, forceUpdate] = useState({});
 
+  // Debug: Log auth and alerts state
+  useEffect(() => {
+    console.log('🔑 Auth State:', { isAuthenticated, user, token });
+    console.log('🔔 Alerts Number:', alertsNumber);
+  }, [isAuthenticated, user, token, alertsNumber]);
+
   // Initialize server URL on app start
   useEffect(() => {
     initializeServerUrl();
@@ -202,7 +208,7 @@ function AppContent() {
             <Link to="/" className="nav-link">📊 Dashboard</Link>
             <Link to="/alerts" className="nav-link alerts-link">
               🚨 Alerts
-              {token && alertsNumber > 0 && (<span className="alerts-badge">{alertsNumber}</span>)}
+              {alertsNumber > 0 && (<span className="alerts-badge">{alertsNumber}</span>)}
             </Link>
             <Link to="/reports" className="nav-link">📈 Reports</Link>
             <Link to="/billing" className="nav-link">💰 Billing</Link>

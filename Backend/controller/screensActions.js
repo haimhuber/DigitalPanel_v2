@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const path = require('path'); // Helps with file paths
 const sqlData = require('../database/myRepository');
+const { notifyAlertAcknowledged, getActiveAlertsCount } = require('../websocketServer');
 const { log } = require('console');
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json());
@@ -159,6 +160,12 @@ const ackAlarmBy = async (req, res) => {
     const { ackId, ackBy } = req.body;
     try {
         const alarmAckBy = await sqlData.akcAlertBy(ackId, ackBy);
+        
+        // Notify WebSocket clients about the acknowledgement
+        const pool = await sqlData.getPool();
+        const alertsCount = await getActiveAlertsCount(pool);
+        notifyAlertAcknowledged(alertsCount);
+        
         res.status(200).json(alarmAckBy);
     } catch (err) {
         console.error('Error  Alert Ack By:', err);
