@@ -15,6 +15,9 @@ interface ConsumptionData {
   cumulative_cost: number;
   peak_consumption?: number;
   offpeak_consumption?: number;
+  // הוסף שדה אופציונלי לדגימות שעתיות (24 ערכים)
+  hourly_consumption?: number[];
+  isEstimated?: boolean; // Whether the data is estimated (not all 24 hours)
 }
 
 type SeasonKey = 'summer' | 'winter' | 'springAutumn';
@@ -54,6 +57,17 @@ export const BillingScreen = () => {
 
   const isWeekend = (dayOfWeek: number) => dayOfWeek === 5 || dayOfWeek === 6; // Fri/Sat
 
+  // פונקציה פשוטה שמחזירה את שעת סיום הפיק (לפי עונה ויום)
+  const getPeakEndHour = (date: Date): number => {
+    const month = date.getMonth() + 1;
+    const dayOfWeek = date.getDay();
+    // שישי/שבת - אין פיק
+    if (dayOfWeek === 5 || dayOfWeek === 6) return 0;
+    if (month >= 6 && month <= 9) return 23; // קיץ
+    if (month === 12 || month === 1 || month === 2) return 22; // חורף
+    return 22; // אביב/סתיו
+  };
+
   const getTariffForDate = (date: Date) => {
     const seasonKey = getSeasonKey(date);
     const seasonRates = tariffRates[seasonKey as keyof typeof tariffRates];
@@ -64,28 +78,21 @@ export const BillingScreen = () => {
     let peakHoursLabel = 'No peak';
     let offPeakHoursLabel = 'All hours';
 
-    // Winter: all days have peak hours 17:00-22:00
-    if (seasonKey === 'winter') {
-      peakHours = 5; // 17:00-22:00 = 5 hours
-      peakHoursLabel = '17:00-22:00';
-      offPeakHoursLabel = '00:00-17:00 and 22:00-24:00';
-    }
-    // Non-winter seasons: check if it's a weekday
-    else if (!weekend) {
-      if (seasonKey === 'summer') {
-        peakHours = 6; // 17:00-23:00 = 6 hours
-        peakHoursLabel = '17:00-23:00';
-        offPeakHoursLabel = '00:00-17:00 and 23:00-24:00';
-      } else { // spring/autumn weekdays
-        peakHours = 5; // 17:00-22:00 = 5 hours
-        peakHoursLabel = '17:00-22:00';
-        offPeakHoursLabel = '00:00-17:00 and 22:00-24:00';
-      }
-    } else {
-      // Non-winter weekends (Fri/Sat): no peak pricing
+
+    // שימוש בפונקציה הפשוטה
+    const peakEnd = getPeakEndHour(date);
+    if (peakEnd === 0) {
       peakHours = 0;
       peakHoursLabel = 'No peak (Fri/Sat)';
       offPeakHoursLabel = 'All hours (24:00)';
+    } else if (peakEnd === 23) {
+      peakHours = 6;
+      peakHoursLabel = '17:00-23:00';
+      offPeakHoursLabel = '00:00-17:00 and 23:00-24:00';
+    } else {
+      peakHours = 5;
+      peakHoursLabel = '17:00-22:00';
+      offPeakHoursLabel = '00:00-17:00 and 22:00-24:00';
     }
 
     const offPeakHours = 24 - peakHours;
@@ -181,6 +188,32 @@ export const BillingScreen = () => {
     return Math.abs(hash);
   };
 
+  // חישוב צריכת פיק/שפל אמיתית לפי דגימות שעתיות (אם קיימות)
+  const calcPeakOffPeak = (date: Date, hourly: number[] | undefined) => {
+    if (!hourly || hourly.length === 0) return { peak: 0, offpeak: 0, isEstimated: true };
+    const month = date.getMonth() + 1;
+    const dayOfWeek = date.getDay();
+    let peakHours: number[] = [];
+    if (dayOfWeek === 5 || dayOfWeek === 6) {
+      // weekend: הכל שפל
+      return { peak: 0, offpeak: hourly.reduce((a, b) => a + b, 0), isEstimated: hourly.length !== 24 };
+    }
+    if (month >= 6 && month <= 9) {
+      // קיץ: 17:00-23:00
+      peakHours = [17, 18, 19, 20, 21, 22];
+    } else {
+      // חורף/אביב/סתיו: 17:00-22:00
+      peakHours = [17, 18, 19, 20, 21];
+    }
+    let peak = 0, offpeak = 0;
+    for (let h = 0; h < hourly.length; h++) {
+      if (peakHours.includes(h)) peak += hourly[h];
+      else offpeak += hourly[h];
+    }
+    // אם אין 24 שעות - זה משוער
+    return { peak, offpeak, isEstimated: hourly.length !== 24 };
+  };
+
   const fetchRealData = async () => {
     setLoading(true);
     setConsumptionData([]); // איפוס הנתונים
@@ -192,10 +225,16 @@ export const BillingScreen = () => {
         // Add peak/off-peak calculation to each row
         const processed = result.data.map((item: ConsumptionData) => {
           const date = new Date(item.consumption_date);
-          const tariff = getTariffForDate(date);
-          const peak = +(item.daily_consumption * (tariff.peakHours / 24)).toFixed(2);
-          const offpeak = +(item.daily_consumption * (tariff.offPeakHours / 24)).toFixed(2);
-          return { ...item, peak_consumption: peak, offpeak_consumption: offpeak };
+          // אם יש hourly_consumption - לחשב לפי דגימות, אחרת לפי יחס שעות
+          if (item.hourly_consumption && item.hourly_consumption.length > 0) {
+            const { peak, offpeak, isEstimated } = calcPeakOffPeak(date, item.hourly_consumption);
+            return { ...item, peak_consumption: +peak.toFixed(2), offpeak_consumption: +offpeak.toFixed(2), isEstimated };
+          } else {
+            const tariff = getTariffForDate(date);
+            const peak = +(item.daily_consumption * (tariff.peakHours / 24)).toFixed(2);
+            const offpeak = +(item.daily_consumption * (tariff.offPeakHours / 24)).toFixed(2);
+            return { ...item, peak_consumption: peak, offpeak_consumption: offpeak, isEstimated: true };
+          }
         });
         setConsumptionData(processed);
       } else {
@@ -434,21 +473,27 @@ export const BillingScreen = () => {
       doc.text(`Total Consumption: ${totalConsumption.toFixed(1)} kWh`, 25, 93);
       doc.text(`Total Cost: ${totalCost.toFixed(2)} ILS`, 25, 101);
 
-      // Table with proper columns
+
+      // Table with requested columns and improved layout
       let yPos = 120;
-      const colX = [20, 55, 90, 120, 155]; // X positions
+  // Adjusted column positions for better fit and increased gap between Date and kWh
+  // Date, kWh, kWh PEAK, kWh OFF-PEAK, Cost(ILS), Season
+  // Page width: 210mm, margins: 20mm left/right, usable: 170mm
+  // Column widths: [40, 18, 28, 28, 28, 28] (total 170)
+  const colX = [20, 60, 78, 106, 134, 162];
 
       // Table header
-      doc.setFontSize(9);
+      doc.setFontSize(10);
       doc.setFillColor(255, 105, 0);
       doc.rect(20, yPos - 6, 170, 10, 'F');
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
       doc.text('Date', colX[0] + 2, yPos);
       doc.text('kWh', colX[1] + 2, yPos);
-      doc.text('Cost (ILS)', colX[2] + 2, yPos);
-      doc.text('Rate', colX[3] + 2, yPos);
-      doc.text('Eff%', colX[4] + 2, yPos);
+      doc.text('kWh PEAK', colX[2] + 2, yPos);
+      doc.text('kWh OFF-PEAK', colX[3] + 2, yPos);
+      doc.text('Cost (ILS)', colX[4] + 2, yPos);
+      doc.text('Season', colX[5] + 2, yPos);
 
       yPos += 12;
       doc.setTextColor(44, 62, 80);
@@ -464,30 +509,22 @@ export const BillingScreen = () => {
         const date = new Date(item.consumption_date);
         const dateStr = date.toLocaleDateString('en-US', {
           month: 'short',
-          day: 'numeric'
+          day: 'numeric',
+          year: 'numeric',
+          weekday: 'long'
         });
-        const month = date.getMonth() + 1;
-        const dayOfWeek = date.getDay();
-        const isWeekend = dayOfWeek === 5 || dayOfWeek === 6;
-
-        let peakHours = '';
-        if (isWeekend) {
-          peakHours = 'No peak';
-        } else if (month >= 6 && month <= 9) {
-          peakHours = '17:00-23:00';
-        } else if (month === 12 || month === 1 || month === 2) {
-          peakHours = '17:00-22:00';
-        } else {
-          peakHours = '17:00-22:00';
-        }
-
-        const efficiency = Math.round(Math.min(100, (efficiencyBase - item.daily_consumption) * efficiencyMultiplier + 50));
+        // Season short
+        let seasonShort = item.season;
+        if (seasonShort === 'Spring/Autumn') seasonShort = 'S/A';
+        if (seasonShort === 'Summer') seasonShort = 'Sum';
+        if (seasonShort === 'Winter') seasonShort = 'Win';
 
         doc.text(dateStr, colX[0] + 2, yPos);
         doc.text(item.daily_consumption.toFixed(1), colX[1] + 2, yPos);
-        doc.text(item.daily_cost.toFixed(2), colX[2] + 2, yPos);
-        doc.text(peakHours, colX[3] + 2, yPos);
-        doc.text(efficiency + '%', colX[4] + 2, yPos);
+        doc.text((item.peak_consumption ?? 0).toFixed(2), colX[2] + 2, yPos);
+        doc.text((item.offpeak_consumption ?? 0).toFixed(2), colX[3] + 2, yPos);
+        doc.text(item.daily_cost.toFixed(2), colX[4] + 2, yPos);
+        doc.text(seasonShort, colX[5] + 2, yPos);
 
         yPos += 10;
       });
@@ -498,9 +535,10 @@ export const BillingScreen = () => {
       doc.setFont('helvetica', 'bold');
       doc.text('TOTAL', colX[0] + 2, yPos);
       doc.text(totalConsumption.toFixed(1), colX[1] + 2, yPos);
-      doc.text(totalCost.toFixed(2), colX[2] + 2, yPos);
-      doc.text('-', colX[3] + 2, yPos);
-      doc.text('-', colX[4] + 2, yPos);
+      doc.text(consumptionData.reduce((sum, item) => sum + (item.peak_consumption || 0), 0).toFixed(2), colX[2] + 2, yPos);
+      doc.text(consumptionData.reduce((sum, item) => sum + (item.offpeak_consumption || 0), 0).toFixed(2), colX[3] + 2, yPos);
+      doc.text(totalCost.toFixed(2), colX[4] + 2, yPos);
+      doc.text('-', colX[5] + 2, yPos);
 
       // Footer
       const pageHeight = doc.internal.pageSize.height;
@@ -739,17 +777,57 @@ export const BillingScreen = () => {
               </thead>
             <tbody>
               {consumptionData.map((item, index) => (
-                <tr key={index}>
-                  <td>{new Date(item.consumption_date).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}</td>
+                <tr
+                  key={index}
+                  title={
+                    item.isEstimated === true
+                      ? 'Estimated data – not all 24 hourly samples available'
+                      : (Array.isArray(item.hourly_consumption) && item.hourly_consumption.length === 24)
+                        ? 'Complete data – all 24 hourly samples available'
+                        : ''
+                  }
+                >
+                  <td>
+                    {item.isEstimated === true ? (
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          background: 'red',
+                          marginRight: 6,
+                          verticalAlign: 'middle'
+                        }}
+                        title="Estimated data – not all 24 hourly samples available"
+                      ></span>
+                    ) : (Array.isArray(item.hourly_consumption) && item.hourly_consumption.length === 24) ? (
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          background: 'green',
+                          marginRight: 6,
+                          verticalAlign: 'middle'
+                        }}
+                      ></span>
+                    ) : null}
+                    {new Date(item.consumption_date).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </td>
                   <td className="consumption-value">{Math.round(item.daily_consumption * 10) / 10}</td>
                   <td
                     className="peak-value"
                     title={(() => {
+                      if ((item as any).isEstimated) {
+                        return 'Estimated data – not all 24 hourly samples available';
+                      }
                       const date = new Date(item.consumption_date);
                       const month = date.getMonth() + 1;
                       const dayOfWeek = date.getDay();
@@ -763,6 +841,9 @@ export const BillingScreen = () => {
                   <td
                     className="offpeak-value"
                     title={(() => {
+                      if ((item as any).isEstimated) {
+                        return 'Estimated data – not all 24 hourly samples available';
+                      }
                       const date = new Date(item.consumption_date);
                       const month = date.getMonth() + 1;
                       const dayOfWeek = date.getDay();
