@@ -22,12 +22,6 @@ function AppContent() {
   const location = useLocation();
   const [, forceUpdate] = useState({});
 
-  // Debug: Log auth and alerts state
-  useEffect(() => {
-    console.log('🔑 Auth State:', { isAuthenticated, user, token });
-    console.log('🔔 Alerts Number:', alertsNumber);
-  }, [isAuthenticated, user, token, alertsNumber]);
-
   // Initialize server URL on app start
   useEffect(() => {
     initializeServerUrl();

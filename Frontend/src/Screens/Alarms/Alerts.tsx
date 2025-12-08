@@ -21,13 +21,9 @@ export const Alerts = () => {
   const [ackDataBy, setAckDataBy] = useState<AckTimestamp[]>([]);
   const { refreshAlerts } = useAlerts();
 
-  // Debug: Check sessionStorage
-  console.log('👤 Current user from sessionStorage:', ackBy);
-
   const readAllAckData = async () => {
     const res = await fetch(API_ENDPOINTS.ackData);
     const req = await res.json();
-    console.log('📊 Ack Data received:', req.data);
     setAckDataBy(req.data);
   };
 
