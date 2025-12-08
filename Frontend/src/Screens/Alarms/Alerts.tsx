@@ -431,15 +431,19 @@ export const Alerts = () => {
                 })
                 .map((alert) => {
                   const ackTimestamp = ackDataBy.find(item => item.ackId === alert.id)?.timestamp;
+                  const isCommError = !alert.alert_type || alert.alert_type === 'CommStatus - Error' || alert.alert_type.includes('Comm');
+                  const displayType = alert.alert_type || (isCommError ? '📡 Comm Error' : 'Unknown');
+                  const displayMessage = alert.alert_message || (isCommError ? 'Communication error detected' : 'No message');
+                  
                   return (
-                    <tr key={alert.id} style={{ backgroundColor: !alert.alertAck ? '#ff4d4f20' : 'transparent' }}>
+                    <tr key={alert.id} style={{ backgroundColor: !alert.alertAck ? (isCommError ? '#ff4d4f30' : '#ff4d4f20') : 'transparent' }} className={!alert.alertAck && isCommError ? 'comm-error-row' : ''}>
                       <td>{names[alert.alarmId - 1]?.name || 'Unknown'}</td>
                       <td>
-                        <span className={`rate-badge ${alert.alert_type === 'tripped' ? 'peak' : alert.alert_type === 'CommStatus - Error' ? 'standard' : 'off-peak'}`}>
-                          {alert.alert_type}
+                        <span className={`rate-badge ${alert.alert_type === 'tripped' ? 'peak' : isCommError ? 'comm-error-badge' : 'off-peak'}`}>
+                          {displayType}
                         </span>
                       </td>
-                      <td style={{ maxWidth: '200px', wordWrap: 'break-word' }}>{alert.alert_message}</td>
+                      <td style={{ maxWidth: '200px', wordWrap: 'break-word' }}>{displayMessage}</td>
                       <td>{new Date(alert.timestamp).toLocaleString()}</td>
                       <td>
                         {alert.alertAck ? (

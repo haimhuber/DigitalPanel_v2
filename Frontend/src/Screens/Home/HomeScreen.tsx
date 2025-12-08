@@ -575,7 +575,7 @@ export const HomeScreen: React.FC = () => {
                   <div className={`status-indicator ${!breaker.CommStatus ? 'comm-error' : 'tripped'
                     }`}>
                     <span className="status-text">
-                      {!breaker.CommStatus ? 'COMM ERR' : 'TRIPPED'}
+                      {!breaker.CommStatus ? '📡' : 'TRIPPED'}
                     </span>
                   </div>
                 )}

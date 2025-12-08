@@ -358,6 +358,14 @@
   color: #43a047;
 }
 
+.rate-badge.comm-error-badge {
+  background: linear-gradient(145deg, #ef4444, #dc2626);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+  animation: blinkRedBadge 1s infinite;
+}
+
 .ack-badge {
   display: inline-flex;
   align-items: center;
@@ -403,6 +411,41 @@
 
   100% {
     opacity: 1;
+  }
+}
+
+@keyframes blinkRedBadge {
+  0% {
+    background: linear-gradient(145deg, #ef4444, #dc2626);
+    box-shadow: 0 2px 12px rgba(239, 68, 68, 0.6);
+  }
+
+  50% {
+    background: linear-gradient(145deg, #dc2626, #b91c1c);
+    box-shadow: 0 2px 16px rgba(220, 38, 38, 0.8);
+  }
+
+  100% {
+    background: linear-gradient(145deg, #ef4444, #dc2626);
+    box-shadow: 0 2px 12px rgba(239, 68, 68, 0.6);
+  }
+}
+
+.comm-error-row {
+  animation: blinkRedRow 2s infinite;
+}
+
+@keyframes blinkRedRow {
+  0% {
+    background-color: #ff4d4f30 !important;
+  }
+
+  50% {
+    background-color: #ff4d4f50 !important;
+  }
+
+  100% {
+    background-color: #ff4d4f30 !important;
   }
 }
 
