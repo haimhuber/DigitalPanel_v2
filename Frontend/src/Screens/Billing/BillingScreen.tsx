@@ -678,8 +678,8 @@ export const BillingScreen = () => {
         </div>
       </div>
 
-      <div className="charts-section">
-        <div className="chart-card main-chart">
+      <div className="charts-section" style={{ display: 'flex', gap: '24px', alignItems: 'stretch' }}>
+        <div className="chart-card main-chart" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <div className="chart-header">
             <h3>Energy Consumption Trend</h3>
             <div className="chart-legend">
@@ -689,7 +689,7 @@ export const BillingScreen = () => {
               </span>
             </div>
           </div>
-          <div className="chart-container">
+          <div className="chart-container" style={{ flex: 1 }}>
             <Line
               key={`line-${selectedBreaker}-${startDate}-${endDate}`}
               data={lineChartData}
@@ -698,47 +698,29 @@ export const BillingScreen = () => {
           </div>
         </div>
 
-        <div className="chart-card side-chart">
+        <div className="chart-card side-chart" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <div className="chart-header">
-            <h3>Usage Distribution</h3>
+            <h3 style={{ fontSize: '0.95rem', marginBottom: 4 }}>Usage Distribution</h3>
           </div>
-          <div className="chart-container">
+          <div className="chart-container" style={{ flex: 1, marginBottom: 6 }}>
             <Doughnut
               key={`doughnut-${selectedBreaker}`}
               data={doughnutData}
-              options={doughnutOptions}
+              options={{ ...doughnutOptions, maintainAspectRatio: false }}
             />
           </div>
-          <div className="tariff-legend">
-            <div className="tariff-item peak">
-              <span className="tariff-dot" style={{ backgroundColor: '#FF6900' }}></span>
-              {(() => {
-                const month = new Date().getMonth() + 1;
-                const dayOfWeek = new Date().getDay();
-
-                if (month >= 6 && month <= 9) {
-                  return dayOfWeek >= 1 && dayOfWeek <= 5 ? 'Peak Hours (17:00-23:00) - ₪1.69/kWh' : 'No Peak (Weekend)';
-                } else if (month === 12 || month === 1 || month === 2) {
-                  return 'Peak Hours (17:00-22:00) - ₪1.21/kWh';
-                } else {
-                  return dayOfWeek >= 1 && dayOfWeek <= 5 ? 'Peak Hours (07:00-17:00) - ₪0.50/kWh' : 'No Peak (Weekend)';
-                }
-              })()}
-            </div>
-            <div className="tariff-item off-peak">
-              <span className="tariff-dot" style={{ backgroundColor: '#8BC34A' }}></span>
-              {(() => {
-                const month = new Date().getMonth() + 1;
-
-                if (month >= 6 && month <= 9) {
-                  return 'Off-Peak Hours (All other) - ₪0.53/kWh';
-                } else if (month === 12 || month === 1 || month === 2) {
-                  return 'Off-Peak Hours (All other) - ₪0.46/kWh';
-                } else {
-                  return 'Off-Peak Hours (All other) - ₪0.45/kWh';
-                }
-              })()}
-            </div>
+          <div className="tariff-legend" style={{ fontSize: '0.9rem', marginTop: 2, fontWeight: 700, color: '#333', display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+            <span style={{ marginRight: 16, display: 'flex', alignItems: 'center' }}>
+              <span className="tariff-dot" style={{ backgroundColor: '#FF6900', width: 12, height: 12, marginRight: 6, display: 'inline-block' }}></span>
+              Peak Hours: High tariff (usually weekday afternoons/evenings).
+            </span>
+            <span style={{ marginRight: 16, display: 'flex', alignItems: 'center' }}>
+              <span className="tariff-dot" style={{ backgroundColor: '#00BFFF', width: 12, height: 12, marginRight: 6, display: 'inline-block' }}></span>
+              Off-Peak Hours: Low tariff (all other hours).
+            </span>
+            <span style={{ fontWeight: 700 }}>
+              Tariff info updates by season and weekday.
+            </span>
           </div>
         </div>
       </div>
