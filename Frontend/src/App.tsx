@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-do
 import { lazy, Suspense, useState, useEffect } from 'react'
 import './App.css'
 import { useAuth, useAlerts, useTime } from './contexts';
-import { TariffProvider } from './contexts/TariffContext';
+import { TariffProvider, useTariff } from './contexts/TariffContext';
 import { initializeServerUrl } from './config/api';
 
 const HomeScreen = lazy(() => import('./Screens/Home/HomeScreen').then(m => ({ default: m.HomeScreen })));
@@ -22,6 +22,7 @@ function AppContent() {
   const { season, peakOffSeason, shortDate } = useTime();
   const location = useLocation();
   const [, forceUpdate] = useState({});
+  const { tariffRates } = useTariff();
 
   // Initialize server URL on app start
   useEffect(() => {
@@ -93,38 +94,40 @@ function AppContent() {
                 const month = now.getMonth() + 1;
                 const dayOfWeek = now.getDay();
                 const isWeekend = dayOfWeek === 5 || dayOfWeek === 6;
-
-                let peakRate = '';
-                let offPeakRate = '';
-                let isPeakTime = false;
-
+                let seasonKey: 'summer' | 'winter' | 'springAutumn' = 'springAutumn';
                 if (month === 12 || month === 1 || month === 2) {
-                  peakRate = '₪1.21/kWh';
-                  offPeakRate = '₪0.46/kWh';
-                  isPeakTime = hour >= 17 && hour < 22; // All days including weekends
+                  seasonKey = 'winter';
                 } else if (month >= 6 && month <= 9) {
-                  peakRate = '₪1.69/kWh';
-                  offPeakRate = '₪0.53/kWh';
+                  seasonKey = 'summer';
+                }
+                // Map display seasonKey to DB/context keys
+                const keyMap = {
+                  summer: 'Summer',
+                  winter: 'Winter',
+                  springAutumn: 'Spring/Autumn'
+                };
+                const rates = (tariffRates as Record<string, { peakRate: number; offPeakRate: number }>)[keyMap[seasonKey]] || { peakRate: 0, offPeakRate: 0 };
+                let isPeakTime = false;
+                if (seasonKey === 'winter') {
+                  isPeakTime = hour >= 17 && hour < 22;
+                } else if (seasonKey === 'summer') {
                   isPeakTime = !isWeekend && hour >= 17 && hour < 23;
                 } else {
-                  peakRate = '₪0.50/kWh';
-                  offPeakRate = '₪0.45/kWh';
                   isPeakTime = !isWeekend && hour >= 17 && hour < 22;
                 }
-
                 return (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     <div style={{
                       color: isPeakTime ? '#10b981' : '#6b7280',
                       fontWeight: isPeakTime ? '600' : '400'
                     }}>
-                      PEAK RATE - {peakRate}
+                      PEAK RATE - ₪{rates.peakRate?.toFixed(4) || '0.0000'}/kWh
                     </div>
                     <div style={{
                       color: !isPeakTime ? '#10b981' : '#6b7280',
                       fontWeight: !isPeakTime ? '600' : '400'
                     }}>
-                      OFF PEAK RATE - {offPeakRate}
+                      OFF PEAK RATE - ₪{rates.offPeakRate?.toFixed(4) || '0.0000'}/kWh
                     </div>
                   </div>
                 );

@@ -800,14 +800,14 @@ async function updateTariffRate(season, peakRate, offPeakRate, peakHours, weekda
   try {
     const pool = await connectDb.connectionToSqlDB();
     const result = await pool.request()
+      .input('id', sql.Int, id)
       .input('season', sql.VarChar, season)
       .input('peakRate', sql.Decimal(10, 4), peakRate)
       .input('offPeakRate', sql.Decimal(10, 4), offPeakRate)
       .input('peakHours', sql.VarChar, peakHours)
       .input('weekdaysOnly', sql.Bit, weekdaysOnly)
-      .input('efficiencyBase', sql.Decimal(10, 2), efficiencyBase)
-      .input('efficiencyMultiplier', sql.Decimal(10, 2), efficiencyMultiplier)
-      .input('updatedBy', sql.VarChar, updatedBy)
+      .input('isActive', sql.Bit, isActive)
+      .input('createdBy', sql.VarChar, createdBy)
       .execute('UpdateTariffRate');
 
     return { status: 200, data: result.recordset[0] };

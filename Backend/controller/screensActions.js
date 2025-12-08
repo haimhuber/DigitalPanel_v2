@@ -410,11 +410,11 @@ const getTariffRates = async (req, res) => {
 };
 
 const updateTariffRate = async (req, res) => {
-    const { season, peakRate, offPeakRate, peakHours, weekdaysOnly, efficiencyBase, efficiencyMultiplier } = req.body;
-    const updatedBy = req.headers['current-user'] || 'Admin';
+    const { id, season, peakRate, offPeakRate, peakHours, weekdaysOnly, isActive, createdBy } = req.body;
+    const user = req.headers['current-user'] || createdBy || 'Admin';
 
     try {
-        const result = await sqlData.updateTariffRate(season, peakRate, offPeakRate, peakHours, weekdaysOnly, efficiencyBase, efficiencyMultiplier, updatedBy);
+        const result = await sqlData.updateTariffRate(id, season, peakRate, offPeakRate, peakHours, weekdaysOnly, isActive, user);
         res.status(200).json(result);
     } catch (err) {
         console.error('Error updating tariff rate:', err);
@@ -423,12 +423,25 @@ const updateTariffRate = async (req, res) => {
 };
 
 const updateTariffRatesOnly = async (req, res) => {
-    const { season, peakRate, offPeakRate } = req.body;
     const updatedBy = req.headers['current-user'] || 'Admin';
-
+    // Map frontend keys to DB season names
+    const seasonMap = {
+        summer: 'Summer',
+        winter: 'Winter',
+        springAutumn: 'Spring/Autumn'
+    };
+    const seasons = ['summer', 'winter', 'springAutumn'];
+    const results = [];
     try {
-        const result = await sqlData.updateTariffRatesOnly(season, peakRate, offPeakRate, updatedBy);
-        res.status(200).json(result);
+        for (const season of seasons) {
+            if (req.body[season]) {
+                const { peakRate, offPeakRate } = req.body[season];
+                const dbSeason = seasonMap[season];
+                const result = await sqlData.updateTariffRatesOnly(dbSeason, peakRate, offPeakRate, updatedBy);
+                results.push({ season: dbSeason, ...result });
+            }
+        }
+        res.status(200).json({ status: 200, results });
     } catch (err) {
         console.error('Error updating tariff rates only:', err);
         res.status(500).json({ message: 'Server error', error: err.message });

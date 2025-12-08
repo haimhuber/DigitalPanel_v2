@@ -40,15 +40,16 @@ export const BillingScreen = () => {
   const [efficiencyMultiplier, setEfficiencyMultiplier] = useState(2);
 
   // Editable tariff rates state
-  const [summerPeak, setSummerPeak] = useState(tariffRates.summer.peakRate);
-  const [summerOffPeak, setSummerOffPeak] = useState(tariffRates.summer.offPeakRate);
-  const [summerHours, setSummerHours] = useState('17:00-23:00');
-  const [winterPeak, setWinterPeak] = useState(tariffRates.winter.peakRate);
-  const [winterOffPeak, setWinterOffPeak] = useState(tariffRates.winter.offPeakRate);
-  const [winterHours, setWinterHours] = useState('17:00-22:00');
-  const [springPeak, setSpringPeak] = useState(tariffRates.springAutumn.peakRate);
-  const [springOffPeak, setSpringOffPeak] = useState(tariffRates.springAutumn.offPeakRate);
-  const [springHours, setSpringHours] = useState('17:00-22:00');
+  // Use correct keys from DB/context
+    const [summerPeak, setSummerPeak] = useState(tariffRates.summer?.peakRate ?? 0);
+    const [summerOffPeak, setSummerOffPeak] = useState(tariffRates.summer?.offPeakRate ?? 0);
+    const [summerHours, setSummerHours] = useState('17:00-23:00');
+    const [winterPeak, setWinterPeak] = useState(tariffRates.winter?.peakRate ?? 0);
+    const [winterOffPeak, setWinterOffPeak] = useState(tariffRates.winter?.offPeakRate ?? 0);
+    const [winterHours, setWinterHours] = useState('17:00-22:00');
+    const [springPeak, setSpringPeak] = useState(tariffRates.springAutumn?.peakRate ?? 0);
+    const [springOffPeak, setSpringOffPeak] = useState(tariffRates.springAutumn?.offPeakRate ?? 0);
+    const [springHours, setSpringHours] = useState('17:00-22:00');
 
   const getSeasonKey = (date: Date): SeasonKey => {
     const month = date.getMonth() + 1;
@@ -79,7 +80,7 @@ export const BillingScreen = () => {
 
   const getTariffForDate = (date: Date) => {
     const seasonKey = getSeasonKey(date);
-    const seasonRates = tariffRates[seasonKey as keyof typeof tariffRates];
+    const seasonRates = tariffRates[seasonKey] || { peakRate: 0, offPeakRate: 0 };
     const dayOfWeek = date.getDay();
     const weekend = isWeekend(dayOfWeek);
 
@@ -105,15 +106,28 @@ export const BillingScreen = () => {
     }
 
     const offPeakHours = 24 - peakHours;
-    const effectiveRate = weekend
-      ? seasonRates.offPeak
-      : ((peakHours / 24) * seasonRates.peak) + ((offPeakHours / 24) * seasonRates.offPeak);
+      const effectiveRate = weekend
+        ? seasonRates.offPeakRate
+        : ((peakHours / 24) * seasonRates.peakRate) + ((offPeakHours / 24) * seasonRates.offPeakRate);
+
+      return {
+        seasonKey,
+        seasonLabel: getSeasonLabel(seasonKey),
+        peakRate: seasonRates.peakRate,
+        offPeakRate: seasonRates.offPeakRate,
+        peakHoursLabel,
+        offPeakHoursLabel,
+        effectiveRate,
+        isWeekend: weekend,
+        peakHours,
+        offPeakHours
+      };
 
     return {
       seasonKey,
       seasonLabel: getSeasonLabel(seasonKey),
-      peakRate: seasonRates.peak,
-      offPeakRate: seasonRates.offPeak,
+      peakRate: seasonRates.peakRate,
+      offPeakRate: seasonRates.offPeakRate,
       peakHoursLabel,
       offPeakHoursLabel,
       effectiveRate,
@@ -436,19 +450,65 @@ export const BillingScreen = () => {
           efficiencyMultiplier
         })
       });
-      // PATCH all tariff rates in one call
-      const tariffPayload = {
-        summer: { peakRate: summerPeak, offPeakRate: summerOffPeak },
-        winter: { peakRate: winterPeak, offPeakRate: winterOffPeak },
-        springAutumn: { peakRate: springPeak, offPeakRate: springOffPeak }
-      };
-      const tariffResponse = await fetch(API_ENDPOINTS.tariffRates, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(tariffPayload)
-      });
-      if (efficiencyResponse.ok && tariffResponse.ok) {
-        setTariffRates(tariffPayload); // Update context
+
+      // Get latest DB data for ids and other fields
+      const tariffSettingsRes = await fetch(API_ENDPOINTS.tariffRates);
+      let rates = [];
+      if (tariffSettingsRes.ok) {
+        const result = await tariffSettingsRes.json();
+        rates = result.data || [];
+      }
+
+      // Helper to get DB row by season
+      const getDbRow = (seasonLabel) => rates.find(r => r.season === seasonLabel) || {};
+      const currentUser = localStorage.getItem('user') || 'Admin';
+
+      // Build full payload for each season
+      const fullPayload = [
+        {
+          id: getDbRow('Summer').id,
+          season: 'Summer',
+          peakRate: summerPeak,
+          offPeakRate: summerOffPeak,
+          peakHours: summerHours,
+          weekdaysOnly: 1,
+          isActive: 1,
+          createdBy: currentUser
+        },
+        {
+          id: getDbRow('Winter').id,
+          season: 'Winter',
+          peakRate: winterPeak,
+          offPeakRate: winterOffPeak,
+          peakHours: winterHours,
+          weekdaysOnly: 0,
+          isActive: 1,
+          createdBy: currentUser
+        },
+        {
+          id: getDbRow('Spring/Autumn').id,
+          season: 'Spring/Autumn',
+          peakRate: springPeak,
+          offPeakRate: springOffPeak,
+          peakHours: springHours,
+          weekdaysOnly: 1,
+          isActive: 1,
+          createdBy: currentUser
+        }
+      ];
+
+      // Send PATCH for each season
+      let allOk = true;
+      for (const seasonData of fullPayload) {
+        const resp = await fetch(API_ENDPOINTS.tariffRates, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(seasonData)
+        });
+        if (!resp.ok) allOk = false;
+      }
+
+      if (efficiencyResponse.ok && allOk) {
         alert('Settings and tariff rates updated successfully!');
         setShowTariffModal(false);
         fetchRealData(); // Refresh the data
