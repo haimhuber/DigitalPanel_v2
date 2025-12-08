@@ -13,6 +13,8 @@ interface ConsumptionData {
   daily_cost: number;
   cumulative_consumption: number;
   cumulative_cost: number;
+  peak_consumption?: number;
+  offpeak_consumption?: number;
 }
 
 type SeasonKey = 'summer' | 'winter' | 'springAutumn';
@@ -187,7 +189,15 @@ export const BillingScreen = () => {
       const result = await response.json();
 
       if (result.status === 200 && result.data) {
-        setConsumptionData(result.data);
+        // Add peak/off-peak calculation to each row
+        const processed = result.data.map((item: ConsumptionData) => {
+          const date = new Date(item.consumption_date);
+          const tariff = getTariffForDate(date);
+          const peak = +(item.daily_consumption * (tariff.peakHours / 24)).toFixed(2);
+          const offpeak = +(item.daily_consumption * (tariff.offPeakHours / 24)).toFixed(2);
+          return { ...item, peak_consumption: peak, offpeak_consumption: offpeak };
+        });
+        setConsumptionData(processed);
       } else {
         generateDummyData();
       }
@@ -227,6 +237,8 @@ export const BillingScreen = () => {
 
       const cost = consumption * tariff.effectiveRate;
 
+      const peak = +(consumption * (tariff.peakHours / 24)).toFixed(2);
+      const offpeak = +(consumption * (tariff.offPeakHours / 24)).toFixed(2);
       data.push({
         switch_id: parseInt(selectedBreaker),
         consumption_date: dateStr,
@@ -235,7 +247,9 @@ export const BillingScreen = () => {
         daily_consumption: consumption,
         daily_cost: cost,
         cumulative_consumption: 0,
-        cumulative_cost: 0
+        cumulative_cost: 0,
+        peak_consumption: peak,
+        offpeak_consumption: offpeak
       });
     }
 
@@ -694,21 +708,35 @@ export const BillingScreen = () => {
       <div className="data-table-section">
         <div className="table-header">
           <h3>Detailed Consumption Data</h3>
-          <button className="export-btn" onClick={exportToPDF}>Export PDF</button>
+            <button className="export-btn" onClick={exportToPDF}>Export PDF</button>
         </div>
         <div className="table-container">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Consumption (kWh)</th>
-                <th>Cost (₪) incl. VAT</th>
-                <th>Season</th>
-                <th>Peak Rate</th>
-                <th>Off-Peak Rate</th>
-                <th>Efficiency</th>
-              </tr>
-            </thead>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Consumption (kWh)</th>
+                  <th>
+                    Peak (kWh)
+                    <span
+                      style={{ cursor: 'help', color: '#FF6900', marginLeft: 4 }}
+                      title={"Peak hours vary by season and day. Example: Winter 17:00-22:00, Summer 17:00-23:00, Weekend: No peak. Hover over value for exact hours per row."}
+                    >🛈</span>
+                  </th>
+                  <th>
+                    Off-Peak (kWh)
+                    <span
+                      style={{ cursor: 'help', color: '#8BC34A', marginLeft: 4 }}
+                      title={"Off-peak hours vary by season and day. Example: Winter 00:00-17:00, 22:00-24:00; Summer 00:00-17:00, 23:00-24:00; Weekend: All hours. Hover over value for exact hours per row."}
+                    >🛈</span>
+                  </th>
+                  <th>Cost (₪) incl. VAT</th>
+                  <th>Season</th>
+                  <th>Peak Rate</th>
+                  <th>Off-Peak Rate</th>
+                  <th>Efficiency</th>
+                </tr>
+              </thead>
             <tbody>
               {consumptionData.map((item, index) => (
                 <tr key={index}>
@@ -719,6 +747,32 @@ export const BillingScreen = () => {
                     year: 'numeric',
                   })}</td>
                   <td className="consumption-value">{Math.round(item.daily_consumption * 10) / 10}</td>
+                  <td
+                    className="peak-value"
+                    title={(() => {
+                      const date = new Date(item.consumption_date);
+                      const month = date.getMonth() + 1;
+                      const dayOfWeek = date.getDay();
+                      const isWeekend = dayOfWeek === 5 || dayOfWeek === 6;
+                      if (isWeekend) return 'No peak (Weekend)';
+                      if (month >= 6 && month <= 9) return 'Peak: 17:00-23:00';
+                      if (month === 12 || month === 1 || month === 2) return 'Peak: 17:00-22:00';
+                      return 'Peak: 17:00-22:00';
+                    })()}
+                  >{item.peak_consumption?.toFixed(2)}</td>
+                  <td
+                    className="offpeak-value"
+                    title={(() => {
+                      const date = new Date(item.consumption_date);
+                      const month = date.getMonth() + 1;
+                      const dayOfWeek = date.getDay();
+                      const isWeekend = dayOfWeek === 5 || dayOfWeek === 6;
+                      if (isWeekend) return 'Off-Peak: All hours';
+                      if (month >= 6 && month <= 9) return 'Off-Peak: 00:00-17:00, 23:00-24:00';
+                      if (month === 12 || month === 1 || month === 2) return 'Off-Peak: 00:00-17:00, 22:00-24:00';
+                      return 'Off-Peak: 00:00-17:00, 22:00-24:00';
+                    })()}
+                  >{item.offpeak_consumption?.toFixed(2)}</td>
                   <td className="cost-value">₪{item.daily_cost.toFixed(2)}</td>
                   <td>
                     <span className="rate-badge standard">
@@ -781,6 +835,8 @@ export const BillingScreen = () => {
               <tr className="total-row">
                 <td><strong>Total</strong></td>
                 <td className="consumption-value"><strong>{totalConsumption.toFixed(1)} kWh</strong></td>
+                <td className="peak-value"><strong>{consumptionData.reduce((sum, item) => sum + (item.peak_consumption || 0), 0).toFixed(2)} kWh</strong></td>
+                <td className="offpeak-value"><strong>{consumptionData.reduce((sum, item) => sum + (item.offpeak_consumption || 0), 0).toFixed(2)} kWh</strong></td>
                 <td className="cost-value"><strong>₪{totalCost.toFixed(2)}</strong></td>
                 <td>-</td>
                 <td>-</td>
