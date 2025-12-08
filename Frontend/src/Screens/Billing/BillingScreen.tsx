@@ -861,7 +861,7 @@ export const BillingScreen = () => {
                   <th>Season</th>
                   <th>Peak Hours</th>
                   <th>Off-Peak Rate</th>
-                  <th>Efficiency</th>
+                  <th>Daily Efficiency</th>
                 </tr>
               </thead>
             <tbody>
@@ -986,15 +986,34 @@ export const BillingScreen = () => {
                     })()}
                   </td>
                   <td>
-                    <div className="efficiency-container">
-                      <div className="efficiency-bar">
-                        <div
-                          className="efficiency-fill"
-                          style={{ width: `${Math.min(100, Math.max(0, (efficiencyBase - item.daily_consumption) * efficiencyMultiplier + 50))}%` }}
-                        ></div>
+                    <div
+                      className="efficiency-container"
+                      style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                      title={
+                        `Daily Efficiency compares today's consumption to the previous day.
+Formula: Efficiency = 100 - ((Today - Yesterday) / Yesterday) * 100
+If today < yesterday, efficiency = 100%. If yesterday = 0, shows 'Not Available'.`
+                      }
+                    >
+                      <div className="efficiency-bar" style={{ marginRight: 8 }}>
+                        {(() => {
+                          if (index === 0) return <div className="efficiency-fill" style={{ width: '100%' }}></div>;
+                          const prev = consumptionData[index - 1]?.daily_consumption;
+                          if (prev === 0) return <div className="efficiency-fill" style={{ width: '0%' }}>N/A</div>;
+                          if (!prev) return <div className="efficiency-fill" style={{ width: '100%' }}></div>;
+                          const percent = Math.max(0, Math.min(100, 100 - ((item.daily_consumption - prev) / prev) * 100));
+                          return <div className="efficiency-fill" style={{ width: percent + '%' }}></div>;
+                        })()}
                       </div>
                       <span className="efficiency-text">
-                        {Math.round(Math.min(100, (efficiencyBase - item.daily_consumption) * efficiencyMultiplier + 50))}%
+                        {(() => {
+                          if (index === 0) return '100%';
+                          const prev = consumptionData[index - 1]?.daily_consumption;
+                          if (prev === 0) return 'Not Available';
+                          if (!prev) return '100%';
+                          const percent = Math.max(0, Math.min(100, 100 - ((item.daily_consumption - prev) / prev) * 100));
+                          return Math.round(percent) + '%';
+                        })()}
                       </span>
                     </div>
                   </td>
