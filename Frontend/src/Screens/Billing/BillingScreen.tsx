@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Line, Doughnut } from 'react-chartjs-2';
 import jsPDF from 'jspdf';
 import { API_ENDPOINTS } from '../../config/api';
+import { useTariff } from '../../contexts/TariffContext';
 import './BillingScreen.css';
 
 interface ConsumptionData {
@@ -23,6 +24,8 @@ interface ConsumptionData {
 type SeasonKey = 'summer' | 'winter' | 'springAutumn';
 
 export const BillingScreen = () => {
+  const { tariffRates, setTariffRates } = useTariff();
+
   const [selectedBreaker, setSelectedBreaker] = useState<string>('1');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
@@ -33,13 +36,19 @@ export const BillingScreen = () => {
   const [adminPassword, setAdminPassword] = useState<string>('');
   const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
   const [breakerOptions, setBreakerOptions] = useState<Array<{ value: string; label: string; type: string }>>([]);
-  const tariffRates = {
-    summer: { peak: 1.6895, offPeak: 0.5283, peakHours: '17:00-23:00' },
-    winter: { peak: 1.2071, offPeak: 0.4557, peakHours: '17:00-22:00' },
-    springAutumn: { peak: 0.4977, offPeak: 0.446, peakHours: '17:00-22:00' }
-  };
   const [efficiencyBase, setEfficiencyBase] = useState(50);
   const [efficiencyMultiplier, setEfficiencyMultiplier] = useState(2);
+
+  // Editable tariff rates state
+  const [summerPeak, setSummerPeak] = useState(tariffRates.summer.peakRate);
+  const [summerOffPeak, setSummerOffPeak] = useState(tariffRates.summer.offPeakRate);
+  const [summerHours, setSummerHours] = useState('17:00-23:00');
+  const [winterPeak, setWinterPeak] = useState(tariffRates.winter.peakRate);
+  const [winterOffPeak, setWinterOffPeak] = useState(tariffRates.winter.offPeakRate);
+  const [winterHours, setWinterHours] = useState('17:00-22:00');
+  const [springPeak, setSpringPeak] = useState(tariffRates.springAutumn.peakRate);
+  const [springOffPeak, setSpringOffPeak] = useState(tariffRates.springAutumn.offPeakRate);
+  const [springHours, setSpringHours] = useState('17:00-22:00');
 
   const getSeasonKey = (date: Date): SeasonKey => {
     const month = date.getMonth() + 1;
@@ -418,7 +427,8 @@ export const BillingScreen = () => {
 
   const handleSaveTariffs = async () => {
     try {
-      const response = await fetch(API_ENDPOINTS.efficiencySettings, {
+      // PATCH efficiency settings
+      const efficiencyResponse = await fetch(API_ENDPOINTS.efficiencySettings, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -426,14 +436,28 @@ export const BillingScreen = () => {
           efficiencyMultiplier
         })
       });
-      if (response.ok) {
-        alert('Settings saved successfully!');
+      // PATCH all tariff rates in one call
+      const tariffPayload = {
+        summer: { peakRate: summerPeak, offPeakRate: summerOffPeak },
+        winter: { peakRate: winterPeak, offPeakRate: winterOffPeak },
+        springAutumn: { peakRate: springPeak, offPeakRate: springOffPeak }
+      };
+      const tariffResponse = await fetch(API_ENDPOINTS.tariffRates, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(tariffPayload)
+      });
+      if (efficiencyResponse.ok && tariffResponse.ok) {
+        setTariffRates(tariffPayload); // Update context
+        alert('Settings and tariff rates updated successfully!');
+        setShowTariffModal(false);
         fetchRealData(); // Refresh the data
+      } else {
+        alert('Failed to update settings or tariff rates.');
       }
-    } catch (err) {
-      alert('Error saving settings');
+    } catch (error) {
+      alert('Failed to update settings or tariff rates.');
     }
-    setShowTariffModal(false);
   };
 
   const exportToPDF = () => {
@@ -557,6 +581,45 @@ export const BillingScreen = () => {
       alert('Error generating PDF. Please try again.');
     }
   };
+
+  // Sync local state with context when context changes
+  useEffect(() => {
+    setSummerPeak(tariffRates.summer.peakRate);
+    setSummerOffPeak(tariffRates.summer.offPeakRate);
+    setWinterPeak(tariffRates.winter.peakRate);
+    setWinterOffPeak(tariffRates.winter.offPeakRate);
+    setSpringPeak(tariffRates.springAutumn.peakRate);
+    setSpringOffPeak(tariffRates.springAutumn.offPeakRate);
+  }, [tariffRates]);
+
+  // Fetch latest tariff rates when modal is opened
+  useEffect(() => {
+    if (showTariffModal) {
+      fetch(API_ENDPOINTS.tariffRates)
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data && data.data && data.data.length > 0) {
+            // Map DB data to context shape
+            const dbRates = data.data;
+            const newRates = {
+              summer: {
+                peakRate: Number(dbRates.find(r => r.season === 'Summer')?.peakRate ?? 1.6895),
+                offPeakRate: Number(dbRates.find(r => r.season === 'Summer')?.offPeakRate ?? 0.5283)
+              },
+              winter: {
+                peakRate: Number(dbRates.find(r => r.season === 'Winter')?.peakRate ?? 1.2071),
+                offPeakRate: Number(dbRates.find(r => r.season === 'Winter')?.offPeakRate ?? 0.4557)
+              },
+              springAutumn: {
+                peakRate: Number(dbRates.find(r => r.season === 'Spring/Autumn')?.peakRate ?? 0.4977),
+                offPeakRate: Number(dbRates.find(r => r.season === 'Spring/Autumn')?.offPeakRate ?? 0.446)
+              }
+            };
+            setTariffRates(newRates);
+          }
+        });
+    }
+  }, [showTariffModal]);
 
   return (
     <div className="billing-screen">
@@ -985,11 +1048,11 @@ export const BillingScreen = () => {
                 <h4>Summer (June-September)</h4>
                 <div className="rate-inputs">
                   <label>Peak Rate (₪/kWh, incl. VAT):</label>
-                  <input type="number" step="0.01" defaultValue={1.6895} />
+                  <input type="number" step="0.01" value={summerPeak} onChange={(e) => setSummerPeak(Number(e.target.value))} />
                   <label>Off-Peak Rate (₪/kWh, incl. VAT):</label>
-                  <input type="number" step="0.01" defaultValue={0.5283} />
+                  <input type="number" step="0.01" value={summerOffPeak} onChange={(e) => setSummerOffPeak(Number(e.target.value))} />
                   <label>Peak Hours (weekdays):</label>
-                  <input type="text" defaultValue="17:00-23:00" />
+                  <input type="text" value={summerHours} onChange={(e) => setSummerHours(e.target.value)} />
                 </div>
               </div>
 
@@ -997,11 +1060,11 @@ export const BillingScreen = () => {
                 <h4>Winter (December-February)</h4>
                 <div className="rate-inputs">
                   <label>Peak Rate (₪/kWh, incl. VAT):</label>
-                  <input type="number" step="0.01" defaultValue={1.2071} />
+                  <input type="number" step="0.01" value={winterPeak} onChange={(e) => setWinterPeak(Number(e.target.value))} />
                   <label>Off-Peak Rate (₪/kWh, incl. VAT):</label>
-                  <input type="number" step="0.01" defaultValue={0.4557} />
+                  <input type="number" step="0.01" value={winterOffPeak} onChange={(e) => setWinterOffPeak(Number(e.target.value))} />
                   <label>Peak Hours (all days):</label>
-                  <input type="text" defaultValue="17:00-22:00" />
+                  <input type="text" value={winterHours} onChange={(e) => setWinterHours(e.target.value)} />
                 </div>
               </div>
 
@@ -1009,11 +1072,11 @@ export const BillingScreen = () => {
                 <h4>Spring/Autumn (Mar-May, Oct-Nov)</h4>
                 <div className="rate-inputs">
                   <label>Peak Rate (₪/kWh, incl. VAT):</label>
-                  <input type="number" step="0.01" defaultValue={0.4977} />
+                  <input type="number" step="0.01" value={springPeak} onChange={(e) => setSpringPeak(Number(e.target.value))} />
                   <label>Off-Peak Rate (₪/kWh, incl. VAT):</label>
-                  <input type="number" step="0.01" defaultValue={0.446} />
+                  <input type="number" step="0.01" value={springOffPeak} onChange={(e) => setSpringOffPeak(Number(e.target.value))} />
                   <label>Peak Hours (weekdays only):</label>
-                  <input type="text" defaultValue="17:00-22:00" />
+                  <input type="text" value={springHours} onChange={(e) => setSpringHours(e.target.value)} />
                 </div>
               </div>
 
@@ -1044,7 +1107,7 @@ export const BillingScreen = () => {
               </div>
 
               <div className="modal-actions">
-                <button className="save-btn" onClick={handleSaveTariffs}>Save Changes</button>
+                <button className="save-btn" style={{ background: '#2563eb', color: '#fff', borderRadius: '6px', border: 'none', padding: '10px 24px', fontWeight: 600 }} onClick={handleSaveTariffs}>Save Changes</button>
                 <button className="cancel-btn" onClick={() => {
                   setShowTariffModal(false);
                   setAdminPassword('');

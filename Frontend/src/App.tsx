@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-do
 import { lazy, Suspense, useState, useEffect } from 'react'
 import './App.css'
 import { useAuth, useAlerts, useTime } from './contexts';
+import { TariffProvider } from './contexts/TariffContext';
 import { initializeServerUrl } from './config/api';
 
 const HomeScreen = lazy(() => import('./Screens/Home/HomeScreen').then(m => ({ default: m.HomeScreen })));
@@ -234,7 +235,9 @@ function AppContent() {
 function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <TariffProvider>
+        <AppContent />
+      </TariffProvider>
     </BrowserRouter>
   );
 }
