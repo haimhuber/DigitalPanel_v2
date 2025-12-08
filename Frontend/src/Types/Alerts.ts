@@ -13,7 +13,7 @@ export interface AlertInterface {
 export interface AckTimestamp {
   id: number;
   ackId: number;
-  ackBy: string;
+  user_id: string;
   timestamp: string;
 }
 

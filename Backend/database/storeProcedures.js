@@ -273,8 +273,8 @@ async function createSp() {
             AS
             BEGIN
                 SET NOCOUNT ON;
-                INSERT INTO AckAlert (ackId, user_id)
-                VALUES (@ackId, @ackBy);
+                INSERT INTO AckAlert (ackId, user_id, timestamp)
+                VALUES (@ackId, @ackBy, GETUTCDATE());
         END`);
         console.log("✅ Stored Procedure 'AddAckAlert' created successfully");
 

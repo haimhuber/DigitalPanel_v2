@@ -42,7 +42,8 @@ export const Alerts = () => {
       } else {
         const confiremed = window.confirm("Are you sure you want to acknowledge this alert?");
         if (confiremed) {
-          fetchAlerts();
+          await fetchAlerts();
+          await readAllAckData(); // טעינה מחדש של נתוני המאשרים
           refreshAlerts(); // עדכון מספר ההתראות בקונטקסט
         }
       }
@@ -265,7 +266,7 @@ export const Alerts = () => {
 
       const tableData = sortedAlerts.slice(0, 20).map(alert => {
         const ackTimestamp = ackDataBy.find(item => item.ackId === alert.id)?.timestamp;
-        const ackUser = ackDataBy.find(item => item.ackId === alert.id)?.ackBy;
+        const ackUser = ackDataBy.find(item => item.ackId === alert.id)?.user_id;
         const isCommError = !alert.alert_type || alert.alert_type === 'CommStatus - Error' || alert.alert_type.includes('Comm');
         const displayType = alert.alert_type || (isCommError ? 'Comm Error' : 'Unknown');
         const displayMessage = alert.alert_message || (isCommError ? 'Communication error detected' : 'No message');
@@ -425,7 +426,7 @@ export const Alerts = () => {
                 <th>Message</th>
                 <th>Timestamp</th>
                 <th>Status</th>
-                <th>Action</th>
+                <th>Acknowledge Timestamp</th>
               </tr>
             </thead>
             <tbody>
@@ -436,6 +437,7 @@ export const Alerts = () => {
                 })
                 .map((alert) => {
                   const ackTimestamp = ackDataBy.find(item => item.ackId === alert.id)?.timestamp;
+                  const ackUser = ackDataBy.find(item => item.ackId === alert.id)?.user_id;
                   const isCommError = !alert.alert_type || alert.alert_type === 'CommStatus - Error' || alert.alert_type.includes('Comm');
                   const displayType = alert.alert_type || (isCommError ? '📡 Comm Error' : 'Unknown');
                   const displayMessage = alert.alert_message || (isCommError ? 'Communication error detected' : 'No message');
@@ -455,7 +457,7 @@ export const Alerts = () => {
                           <div className="ack-badge">
                             <span className="ack-icon">✔</span>
                             <span className="ack-text">
-                              {ackDataBy.find(item => item.ackId === alert.id)?.ackBy || "--"}
+                              {ackDataBy.find(item => item.ackId === alert.id)?.user_id || "--"}
                             </span>
                           </div>
                         ) : (
