@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- <link rel="stylesheet" href="./index.css"> -->
+</head>
+<body>
+    <div id="sql-data">
+
+    </div>
+    
+    <script>
+        async function getBreakersData() {
+    try {
+        const response = await fetch('http://localhost:5500/screens/breakersData');
+        const result = await response.json();
+        console.log(result["data"]);
+        
+        const myDiv = document.querySelector("#sql-data");
+        
+
+        if (result.status === 500) {
+            myDiv.textContent = "Server Error! Please check DB connection";
+            return;
+        }
+
+        if (result["status"] === 200) {
+            const data = result["data"];
+            if (Array.isArray(data) && data.length > 0) {
+                for (let index = 0; index < data.length; index++) {
+                    const name = data[index].name; // simpler access
+                    console.log(name);
+
+                    const addValue = document.createElement('h3');
+                    addValue.textContent = name;
+                    myDiv.appendChild(addValue);
+                }
+            } else {
+            }
+        }
+
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        const myDiv = document.querySelector("#sql-data");
+        myDiv.textContent = "Error fetching data. Check console.";
+    }
+}
+
+getBreakersData();
+
+    </script>
+</body>
+</html>

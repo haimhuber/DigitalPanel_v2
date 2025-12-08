@@ -1,0 +1,684 @@
+/* ABB-Style Home Screen */
+.billing-screen {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header Section */
+.billing-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: white;
+  padding: 1.2rem 1.2rem 1.8rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  text-align: left;
+}
+
+.header-content h1 {
+  font-size: 1.6rem;
+  font-weight: 300;
+  margin: 0 0 0.3rem 0;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: 0.7rem;
+  opacity: 0.9;
+  margin: 0;
+  font-weight: 300;
+}
+
+.abb-logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.logo-circle {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #E31E24 0%, #c41820 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  box-shadow:
+    0 4px 12px rgba(227, 30, 36, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(227, 30, 36, 0.3);
+}
+
+.logo-text-circle {
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  letter-spacing: 1px;
+  font-family: Arial, sans-serif;
+}
+
+/* Status Chart Container */
+.status-chart-container {
+  padding: 0 2rem 2rem;
+}
+
+.status-chart-wrapper {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  text-align: center;
+}
+
+.status-chart-wrapper h2 {
+  margin: 0 0 2rem 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.status-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  width: 100%;
+  height: 100px;
+  margin: 0 auto;
+}
+
+.status-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.status-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.status-card.closed {
+  border-top: 3px solid #10b981;
+}
+
+.status-card.open {
+  border-top: 3px solid #f59e0b;
+}
+
+.status-card.comm-error {
+  border-top: 3px solid #6b7280;
+}
+
+.status-card.tripped {
+  border-top: 3px solid #ef4444;
+}
+
+.status-emoji {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.status-number {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 2px;
+}
+
+.status-label {
+  font-size: 9px;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s ease;
+  border-left: 4px solid #e1e8ed;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+}
+
+.metric-card.primary {
+  border-left-color: #FF6900;
+  background: linear-gradient(135deg, #fff 0%, #fff5f0 100%);
+}
+
+.metric-icon {
+  font-size: 2rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.metric-content h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  color: #2c3e50;
+}
+
+.metric-content p {
+  margin: 0.2rem 0 0.5rem 0;
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.metric-change {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  background: #e8f4fd;
+  color: #1e88e5;
+}
+
+.metric-change.positive {
+  background: #e8f5e8;
+  color: #43a047;
+}
+
+.metric-change.negative {
+  background: #ffebee;
+  color: #e53935;
+}
+
+/* Breakers Grid */
+.breakers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  padding: 0 2rem 2rem;
+}
+
+.breaker-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-left: 4px solid #e1e8ed;
+}
+
+.breaker-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(227, 30, 36, 0.2);
+  border-left-color: #E31E24;
+  background: linear-gradient(135deg, #fff 0%, #fef2f2 100%);
+}
+
+.breaker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.breaker-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.status-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.health-indicator {
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(145deg, #10b981, #059669);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+.checkmark {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.status-indicator {
+  width: 60px;
+  height: 30px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-weight: bold;
+  font-size: 0.7rem;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.status-indicator.closed {
+  background: linear-gradient(145deg, #4ade80, #22c55e);
+  box-shadow:
+    0 4px 8px rgba(34, 197, 94, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1);
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.status-indicator.open {
+  background: linear-gradient(145deg, #fbbf24, #f59e0b);
+  box-shadow:
+    0 4px 8px rgba(245, 158, 11, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1);
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.status-indicator.tripped {
+  background: linear-gradient(145deg, #ef4444, #dc2626);
+  box-shadow:
+    0 4px 8px rgba(220, 38, 38, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1);
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.comm-error {
+  background: linear-gradient(145deg, #6b7280, #4b5563);
+  box-shadow:
+    0 4px 8px rgba(75, 85, 99, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1);
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  animation: pulse 3s infinite;
+}
+
+.status-indicator:hover {
+  transform: translateY(-1px);
+}
+
+.status-indicator:active {
+  transform: translateY(0);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.status-text {
+  font-family: 'Arial', sans-serif;
+  font-weight: 700;
+}
+
+.breaker-info {
+  margin-bottom: 1rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.info-row span:first-child {
+  font-weight: 600;
+  color: #5a6c7d;
+}
+
+.info-row span:last-child {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.status-ok {
+  color: #059669;
+  font-weight: 600;
+}
+
+.status-error {
+  color: #d90429;
+  font-weight: 600;
+}
+
+.breaker-data {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.data-section h4 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e1e8ed;
+  padding-bottom: 0.3rem;
+}
+
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #5a6c7d;
+}
+
+/* Sidebar */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sidebar {
+  width: 500px;
+  height: 100vh;
+  background: white;
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.dashboard-sidebar-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: white;
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.sidebar-header-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dashboard-sidebar-header .abb-logo {
+  margin-bottom: 0;
+}
+
+.dashboard-sidebar-header .logo-circle {
+  width: 50px;
+  height: 50px;
+  background: #E31E24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(227, 30, 36, 0.3);
+}
+
+.dashboard-sidebar-header .logo-text-circle {
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  letter-spacing: 1px;
+  font-family: Arial, sans-serif;
+}
+
+.header-text h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: white;
+}
+
+.header-text .subtitle {
+  margin: 0.3rem 0 0 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  color: white;
+}
+
+.dashboard-sidebar-header .close-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  transition: opacity 0.2s ease;
+}
+
+.dashboard-sidebar-header .close-btn:hover {
+  opacity: 0.7;
+}
+
+.chart-controls {
+  padding: 1.2rem 2rem;
+  border-bottom: 1px solid #f1f3f4;
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 auto;
+}
+
+.chart-controls label {
+  display: block;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.35rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.chart-controls select,
+.chart-controls input[type="date"] {
+  width: auto;
+  min-width: 160px;
+  padding: 0.7rem 0.8rem;
+  border: 2px solid #e1e8ed;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background: white;
+  color: #2c3e50;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.chart-controls select:focus,
+.chart-controls input:focus {
+  outline: none;
+  border-color: #FF6900;
+  box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.1);
+}
+
+.sidebar-chart {
+  flex: 1;
+  padding: 2rem;
+  height: 400px;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .billing-header {
+    padding: 1.2rem 1.2rem 1.8rem;
+  }
+
+  .header-content h1 {
+    font-size: 1.6rem;
+  }
+
+  .subtitle {
+    font-size: 0.7rem;
+  }
+
+  .status-chart-container {
+    padding: 0 1rem 1rem;
+  }
+
+  .status-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+    gap: 10px;
+  }
+
+  .status-card {
+    padding: 8px;
+  }
+
+  .status-number {
+    font-size: 16px;
+  }
+
+  .status-label {
+    font-size: 8px;
+  }
+
+  .breakers-grid {
+    grid-template-columns: 1fr;
+    padding: 0 1rem 1rem;
+    gap: 1rem;
+  }
+
+  .breaker-card {
+    padding: 1rem;
+  }
+
+  .breaker-header h3 {
+    font-size: 1rem;
+  }
+
+  .data-grid {
+    grid-template-columns: 1fr;
+    font-size: 0.8rem;
+  }
+
+  .data-section h4 {
+    font-size: 0.8rem;
+  }
+
+  .sidebar {
+    width: 100vw;
+  }
+
+  .dashboard-sidebar-header {
+    padding: 1rem;
+  }
+
+  .sidebar-header-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .chart-controls {
+    padding: 1rem;
+  }
+
+  .sidebar-chart {
+    padding: 1rem;
+    height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .logo-circle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .logo-text-circle {
+    font-size: 12px;
+  }
+
+  .status-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .breaker-card {
+    padding: 0.8rem;
+  }
+
+  .health-indicator {
+    width: 25px;
+    height: 25px;
+  }
+
+  .checkmark {
+    font-size: 1rem;
+  }
+
+  .status-indicator {
+    width: 50px;
+    height: 25px;
+    font-size: 0.6rem;
+  }
+}

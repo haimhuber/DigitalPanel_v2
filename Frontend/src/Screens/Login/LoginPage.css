@@ -1,0 +1,311 @@
+/* ==== GENERAL LAYOUT ==== */
+.login-fullscreen {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #0a1428 0%, #1a2b4a 50%, #0f1e35 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ==== LOGIN CONTAINER CARD ==== */
+.login-container {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  padding: 0;
+  border-radius: 16px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  width: 420px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  min-height: auto;
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(227, 6, 19, 0.5), transparent);
+  border-radius: 16px 16px 0 0;
+}
+
+/* ==== LOGO SECTION (TOP) ==== */
+.login-logo {
+  width: 91%;
+  background: linear-gradient(180deg, rgba(227, 30, 36, 0.15) 0%, rgba(196, 24, 32, 0.08) 100%);
+  border-bottom: 1px solid rgba(227, 30, 36, 0.2);
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+}
+
+.login-logo-circle {
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(135deg, #E31E24 0%, #c41820 100%);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 5px 12px rgba(227, 30, 36, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.login-logo-text {
+  font-size: 12px;
+  font-weight: 1000;
+  color: white;
+  letter-spacing: 0.8px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.login-logo h2 {
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.2px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.login-subtitle {
+  font-size: 7px;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 600;
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.login-description {
+  display: none;
+}
+
+/* ==== INPUT FIELDS ==== */
+.login-box,
+.auth-box {
+  flex: 1;
+  padding: 40px 45px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-box input,
+.auth-box input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.login-box input::placeholder,
+.auth-box input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.login-box input:focus,
+.auth-box input:focus {
+  border-color: #E31E24;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 0 0 3px rgba(227, 30, 36, 0.1),
+    inset 0 0 10px rgba(227, 30, 36, 0.08);
+}
+
+/* ==== BUTTONS ==== */
+button {
+  padding: 12px;
+  margin-top: 8px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-box button,
+.auth-box button {
+  width: 100%;
+  align-items: center;
+}
+
+/* ==== LOGIN BUTTON ==== */
+button[type="submit"] {
+  background: linear-gradient(135deg, #E31E24 0%, #c41820 100%);
+  color: white;
+  margin-top: 16px;
+  box-shadow:
+    0 8px 20px rgba(227, 30, 36, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(227, 30, 36, 0.5);
+}
+
+button[type="submit"]:hover {
+  background: linear-gradient(135deg, #f0101b 0%, #d41f24 100%);
+  transform: translateY(-2px);
+  box-shadow:
+    0 12px 30px rgba(227, 30, 36, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+button[type="submit"]:active {
+  transform: translateY(0);
+}
+
+/* ==== SECONDARY BUTTON ==== */
+.signin {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  margin-top: 8px;
+}
+
+.signin:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.signin:active {
+  transform: translateY(0);
+}
+
+/* ==== AUTH BOX ==== */
+.auth-box {
+  text-align: center;
+  flex: 1;
+  padding: 30px 35px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 85%;
+  max-width: 300px;
+  overflow: auto;
+  margin: 0 auto;
+}
+
+.auth-box h2 {
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  margin-top: 0;
+  letter-spacing: -0.3px;
+}
+
+.auth-box p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  margin-bottom: 18px;
+  margin-top: 0;
+  line-height: 1.4;
+}
+
+.auth-box input {
+  text-align: center;
+  letter-spacing: 4px;
+  font-size: 14px;
+  font-weight: 1000;
+  font-family: 'Courier New', monospace;
+}
+
+.auth-box button {
+  width: 85%;
+  max-width: 300px;
+  margin: 8px auto;
+}
+
+/* ==== ANIMATIONS ==== */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Button states */
+.signin.enabled {
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.9) 0%, rgba(39, 174, 96, 0.9) 100%);
+  border: 1px solid rgba(46, 204, 113, 0.4);
+  box-shadow:
+    0 4px 12px rgba(46, 204, 113, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.signin.enabled:hover {
+  background: linear-gradient(135deg, rgba(39, 174, 96, 0.95) 0%, rgba(34, 153, 85, 0.95) 100%);
+  box-shadow:
+    0 6px 16px rgba(46, 204, 113, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Disabled state */
+.signin.disabled {
+  background: rgba(231, 76, 60, 0.5);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.signin.disabled:hover {
+  transform: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ==== RESPONSIVE ==== */
+@media (max-width: 480px) {
+  .login-container {
+    width: 90vw;
+    padding: 35px 25px;
+  }
+
+  .login-box h1,
+  .auth-box h2 {
+    font-size: 24px;
+  }
+}

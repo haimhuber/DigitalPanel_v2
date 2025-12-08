@@ -1,0 +1,441 @@
+/* ABB-Style Alerts Screen */
+.billing-screen {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header Section */
+.billing-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: white;
+  padding: 1.2rem 1.2rem 1.8rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  text-align: left;
+}
+
+.header-content h1 {
+  font-size: 1.6rem;
+  font-weight: 300;
+  margin: 0 0 0.3rem 0;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: 0.7rem;
+  opacity: 0.9;
+  margin: 0;
+  font-weight: 300;
+}
+
+.abb-logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.logo-circle {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #E31E24 0%, #c41820 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  box-shadow:
+    0 4px 12px rgba(227, 30, 36, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(227, 30, 36, 0.3);
+}
+
+.logo-text-circle {
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  letter-spacing: 1px;
+  font-family: Arial, sans-serif;
+}
+
+/* Controls Section */
+.billing-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 2rem;
+  margin-top: -2rem;
+  position: relative;
+  z-index: 10;
+  overflow-x: auto;
+}
+
+.control-card {
+  background: white;
+  padding: 1.2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  min-width: 160px;
+  flex: 1;
+  max-width: 250px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+}
+
+.control-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+}
+
+.control-card label {
+  display: block;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.8rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.control-card select,
+.control-card input[type="date"] {
+  width: 100%;
+  padding: 0.6rem;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  background: white;
+  color: #2c3e50;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.control-card select:focus,
+.control-card input:focus {
+  outline: none;
+  border-color: #FF6900;
+  box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.1);
+}
+
+.refresh-btn {
+  width: 100%;
+  padding: 0.8rem 1.2rem;
+  background: #FF6900;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  margin-top: 1.7rem;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  background: #e55a00;
+}
+
+.refresh-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Metrics Grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  padding: 0 2rem 2rem;
+}
+
+.metric-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s ease;
+  border-left: 4px solid #e1e8ed;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+}
+
+.metric-card.primary {
+  border-left-color: #FF6900;
+  background: linear-gradient(135deg, #fff 0%, #fff5f0 100%);
+}
+
+.metric-icon {
+  font-size: 2rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.metric-content h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  color: #2c3e50;
+}
+
+.metric-content p {
+  margin: 0.2rem 0 0.5rem 0;
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.metric-change {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  background: #e8f4fd;
+  color: #1e88e5;
+}
+
+.metric-change.positive {
+  background: #e8f5e8;
+  color: #43a047;
+}
+
+.metric-change.negative {
+  background: #ffebee;
+  color: #e53935;
+}
+
+/* Charts Section */
+.charts-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  padding: 0 2rem 2rem;
+}
+
+.chart-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.chart-header {
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid #f1f3f4;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chart-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 1rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #7f8c8d;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.chart-container {
+  padding: 1rem 1.5rem 1.5rem;
+  height: 300px;
+}
+
+/* Data Table Section */
+.data-table-section {
+  margin: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.table-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #f1f3f4;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.table-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.export-btn {
+  background: #FF6900;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.export-btn:hover {
+  background: #e55a00;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  background: #f8f9fa;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.data-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f1f3f4;
+  color: #5a6c7d;
+}
+
+.data-table tr:hover {
+  background: #f8f9fa;
+}
+
+.rate-badge {
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.rate-badge.peak {
+  background: #ffebee;
+  color: #e53935;
+}
+
+.rate-badge.standard {
+  background: #e3f2fd;
+  color: #1e88e5;
+}
+
+.rate-badge.off-peak {
+  background: #e8f5e8;
+  color: #43a047;
+}
+
+.ack-badge {
+  display: inline-flex;
+  align-items: center;
+  background-color: #28a745;
+  color: #fff;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+.ack-icon {
+  margin-right: 6px;
+}
+
+.ack-timestamp {
+  display: inline-block;
+  color: #666;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.not-ack-badge {
+  display: inline-block;
+  background-color: #dc3545;
+  color: #fff;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .billing-header {
+    padding: 1.2rem 1.2rem 1.8rem;
+  }
+
+  .billing-controls {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .control-card {
+    min-width: unset;
+    max-width: unset;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    padding: 0 1rem 1rem;
+  }
+
+  .charts-section {
+    padding: 0 1rem 1rem;
+  }
+
+  .data-table-section {
+    margin: 1rem;
+  }
+
+  .header-content h1 {
+    font-size: 1.6rem;
+  }
+}

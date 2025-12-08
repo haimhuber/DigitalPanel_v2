@@ -1,0 +1,109 @@
+{
+    "breakers": [
+        {
+            "name": "Q1",
+            "type": "EMAX E1.2",
+            "load": "Main supply"
+        },
+        {
+            "name": "Q2",
+            "type": "XT4",
+            "load": "B1 G Floor"
+        },
+        {
+            "name": "Q3",
+            "type": "XT4",
+            "load": "B2 1st Floor"
+        },
+        {
+            "name": "Q4",
+            "type": "XT4",
+            "load": "B4 2nd Floor"
+        },
+        {
+            "name": "Q7",
+            "type": "XT2",
+            "load": "Spare"
+        },
+        {
+            "name": "Q6",
+            "type": "XT2",
+            "load": "Spare"
+        },
+        {
+            "name": "Q5",
+            "type": "XT2",
+            "load": "Varik elec board"
+        },
+        {
+            "name": "Q8",
+            "type": "XT2",
+            "load": "Bridge"
+        },
+        {
+            "name": "Q8.1",
+            "type": "XT2",
+            "load": "Bridge"
+        },
+        {
+            "name": "Q8.2",
+            "type": "XT2",
+            "load": "Shelter Kitchennette"
+        },
+        {
+            "name": "Q8.3",
+            "type": "XT2",
+            "load": "Kitchennette"
+        },
+        {
+            "name": "Q8.15",
+            "type": "XT2",
+            "load": "Curtain wall"
+        },
+        {
+            "name": "Q9",
+            "type": "XT2",
+            "load": "Brigde"
+        },
+        {
+            "name": "Q9.1",
+            "type": "XT2",
+            "load": "Robot"
+        },
+        {
+            "name": "Q9.2",
+            "type": "XT2",
+            "load": "Robot"
+        },
+        {
+            "name": "Q9.3",
+            "type": "Spare",
+            "load": "Spare"
+        },
+        {
+            "name": "Q9.4",
+            "type": "XT2",
+            "load": "Robots"
+        },
+        {
+            "name": "Q10",
+            "type": "XT2",
+            "load": "W10"
+        },
+        {
+            "name": "Q11",
+            "type": "XT2",
+            "load": "W11"
+        },
+        {
+            "name": "Q12",
+            "type": "XT2",
+            "load": "W12"
+        },
+         {
+            "name": "Q13",
+            "type": "XT2",
+            "load": "W13"
+        }
+    ]
+}
