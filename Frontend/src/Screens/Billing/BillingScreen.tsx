@@ -710,17 +710,61 @@ export const BillingScreen = () => {
             />
           </div>
           <div className="tariff-legend" style={{ fontSize: '0.9rem', marginTop: 2, fontWeight: 700, color: '#333', display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-            <span style={{ marginRight: 16, display: 'flex', alignItems: 'center' }}>
-              <span className="tariff-dot" style={{ backgroundColor: '#FF6900', width: 12, height: 12, marginRight: 6, display: 'inline-block' }}></span>
-              Peak Hours: High tariff (usually weekday afternoons/evenings).
-            </span>
-            <span style={{ marginRight: 16, display: 'flex', alignItems: 'center' }}>
-              <span className="tariff-dot" style={{ backgroundColor: '#00BFFF', width: 12, height: 12, marginRight: 6, display: 'inline-block' }}></span>
-              Off-Peak Hours: Low tariff (all other hours).
-            </span>
-            <span style={{ fontWeight: 700 }}>
-              Tariff info updates by season and weekday.
-            </span>
+            {(() => {
+              const now = new Date();
+              const month = now.getMonth() + 1;
+              const dayOfWeek = now.getDay();
+              let peakHours = '';
+              let offPeakHours = '';
+              let season = '';
+              let emoji = '';
+              if (month >= 6 && month <= 9) {
+                season = 'Summer'; emoji = '🌞';
+                if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                  peakHours = '17:00-23:00';
+                  offPeakHours = '00:00-17:00, 23:00-24:00';
+                } else {
+                  peakHours = 'No peak (Weekend)';
+                  offPeakHours = 'All hours';
+                }
+              } else if (month === 12 || month === 1 || month === 2) {
+                season = 'Winter'; emoji = '❄️';
+                peakHours = '17:00-22:00';
+                offPeakHours = '00:00-17:00, 22:00-24:00';
+              } else {
+                season = 'Spring/Autumn'; emoji = '🌷';
+                if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                  peakHours = '17:00-22:00';
+                  offPeakHours = '00:00-17:00, 22:00-24:00';
+                } else {
+                  peakHours = 'No peak (Weekend)';
+                  offPeakHours = 'All hours';
+                }
+              }
+              return (
+                <>
+                  <span style={{ marginRight: 16, display: 'flex', alignItems: 'center' }}>
+                    <span className="tariff-dot" style={{ backgroundColor: '#FF6900', width: 12, height: 12, marginRight: 6, display: 'inline-block' }}></span>
+                    Peak Hours: {peakHours}
+                  </span>
+                  <span style={{ marginRight: 16, display: 'flex', alignItems: 'center' }}>
+                    <span className="tariff-dot" style={{ backgroundColor: '#00BFFF', width: 12, height: 12, marginRight: 6, display: 'inline-block' }}></span>
+                    Off-Peak Hours: {offPeakHours} <span style={{ margin: '0 8px' }}>|</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                      Season: {season}
+                      <span style={{
+                        display: 'inline-block',
+                        fontSize: '0.9em',
+                        filter: 'drop-shadow(0 2px 4px #aaa)',
+                        transform: 'scale(1.2) rotate(-10deg)',
+                        transition: 'transform 0.2s',
+                        marginLeft: 4
+                      }}>{emoji}</span>
+                    </span>
+                  </span>
+                </>
+              );
+            })()}
           </div>
         </div>
       </div>
