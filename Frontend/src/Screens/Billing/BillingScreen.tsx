@@ -179,6 +179,24 @@ export const BillingScreen = () => {
         if (rates.length > 0) {
           setEfficiencyBase(rates[0].efficiencyBase || 50);
           setEfficiencyMultiplier(rates[0].efficiencyMultiplier || 2);
+          // Update tariffRates context from DB
+          const summer = rates.find((r: any) => r.season === 'Summer') || {};
+          const winter = rates.find((r: any) => r.season === 'Winter') || {};
+          const springAutumn = rates.find((r: any) => r.season === 'Spring/Autumn') || {};
+          setTariffRates({
+            summer: {
+              peakRate: Number(summer.peakRate ?? 0),
+              offPeakRate: Number(summer.offPeakRate ?? 0)
+            },
+            winter: {
+              peakRate: Number(winter.peakRate ?? 0),
+              offPeakRate: Number(winter.offPeakRate ?? 0)
+            },
+            springAutumn: {
+              peakRate: Number(springAutumn.peakRate ?? 0),
+              offPeakRate: Number(springAutumn.offPeakRate ?? 0)
+            }
+          });
         }
       }
     } catch (err) {

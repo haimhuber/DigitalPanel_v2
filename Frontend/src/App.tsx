@@ -100,13 +100,7 @@ function AppContent() {
                 } else if (month >= 6 && month <= 9) {
                   seasonKey = 'summer';
                 }
-                // Map display seasonKey to DB/context keys
-                const keyMap = {
-                  summer: 'Summer',
-                  winter: 'Winter',
-                  springAutumn: 'Spring/Autumn'
-                };
-                const rates = (tariffRates as Record<string, { peakRate: number; offPeakRate: number }>)[keyMap[seasonKey]] || { peakRate: 0, offPeakRate: 0 };
+                const rates = tariffRates[seasonKey] || { peakRate: 0, offPeakRate: 0 };
                 let isPeakTime = false;
                 if (seasonKey === 'winter') {
                   isPeakTime = hour >= 17 && hour < 22;
