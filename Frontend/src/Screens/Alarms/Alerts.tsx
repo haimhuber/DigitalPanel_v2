@@ -267,7 +267,7 @@ export const Alerts = () => {
         const ackTimestamp = ackDataBy.find(item => item.ackId === alert.id)?.timestamp;
         const ackUser = ackDataBy.find(item => item.ackId === alert.id)?.ackBy;
         const isCommError = !alert.alert_type || alert.alert_type === 'CommStatus - Error' || alert.alert_type.includes('Comm');
-        const displayType = alert.alert_type || (isCommError ? '📡 Comm Error' : 'Unknown');
+        const displayType = alert.alert_type || (isCommError ? 'Comm Error' : 'Unknown');
         const displayMessage = alert.alert_message || (isCommError ? 'Communication error detected' : 'No message');
         
         return [
