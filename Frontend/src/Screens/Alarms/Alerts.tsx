@@ -76,7 +76,7 @@ export const Alerts = () => {
   const fetchAlerts = async () => {
     try {
       const response = await getAlerts();
-      setAlerts(response.data ?? []);
+      setAlerts(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       // Error handled silently
     }
@@ -486,6 +486,13 @@ export const Alerts = () => {
                     </tr>
                   );
                 })}
+              {(Array.isArray(filteredAlerts) ? filteredAlerts : []).length === 0 && (
+                <tr>
+                  <td colSpan={6} style={{ textAlign: 'center', color: '#888', fontStyle: 'italic' }}>
+                    No Alarms to Display
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

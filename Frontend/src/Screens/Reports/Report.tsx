@@ -343,7 +343,7 @@ const Report = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {data
+                  {(Array.isArray(data) ? data : [])
                     .filter(alert => {
                       if (!startDate || !endDate) return true;
                       const alertDate = new Date(alert.timestamp).toISOString().split('T')[0];
@@ -354,9 +354,9 @@ const Report = () => {
                         <td>{alert.id}</td>
                         <td>{alert.alarmId}</td>
                         <td>
-                          <span className="rate-badge standard">{alert.alert_type}</span>
+                          <span className="rate-badge standard">{alert.alarmType}</span>
                         </td>
-                        <td>{alert.alert_message}</td>
+                        <td>{alert.alarmMessage}</td>
                         <td>
                           <span className={`rate-badge ${alert.alertAck ? 'off-peak' : 'peak'}`}>
                             {alert.alertAck ? "✓ ACK" : "⚠ Not Ack"}
@@ -367,6 +367,13 @@ const Report = () => {
                         </td>
                       </tr>
                     ))}
+                  {(Array.isArray(data) ? data : []).length === 0 && (
+                    <tr>
+                      <td colSpan={6} style={{ textAlign: 'center', color: '#888', fontStyle: 'italic' }}>
+                        No Alarms to Display
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

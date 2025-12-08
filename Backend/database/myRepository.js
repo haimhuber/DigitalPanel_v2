@@ -70,12 +70,17 @@ async function checkAndAddAlerts(pool, switchId, bits) {
     
     // bits[0] = CommStatus -> 0 = תקלת תקשורת
     if (bits[0] === 0) {
+      // Get breaker name from MainData table
+      const breakerResult = await pool.request()
+        .input('id', sql.Int, switchId)
+        .query('SELECT name FROM MainData WHERE id = @id');
+      const breakerName = breakerResult.recordset[0]?.name || `Q${switchId}`;
       await pool.request()
         .input('switch_id', sql.Int, switchId)
         .input('alert_type', sql.VarChar(50), 'CommStatus - Error')
-        .input('alert_message', sql.VarChar(255), `תקלת תקשורת במתג ${switchId}`)
+        .input('alert_message', sql.VarChar(255), `Communication error detected on breaker ${breakerName}`)
         .execute('AddProtectionAlert');
-      console.log(`🚨 Alert added: CommStatus Error on switch ${switchId}`);
+      console.log(`🚨 Alert added: CommStatus Error on breaker ${breakerName}`);
       alertAdded = true;
     }
 
