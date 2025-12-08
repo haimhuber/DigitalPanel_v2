@@ -1,17 +1,20 @@
 /* ABB-Style Billing Screen */
+
 .billing-screen {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(120deg, #f7f7f7 0%, #eaeaea 100%);
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Header Section */
 .billing-header {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  color: white;
+  background: linear-gradient(90deg, #fff 60%, #f7f7f7 100%);
+  color: #222;
   padding: 0.6rem 1.2rem 0.8rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  border-bottom: 1px solid #eaeaea;
+  transition: box-shadow 0.3s;
 }
 
 .header-content {
@@ -73,30 +76,33 @@
 }
 
 .control-card {
-  background: white;
+  background: linear-gradient(120deg, #fff 80%, #f2f2f2 100%);
+  color: #222;
   padding: 1.2rem;
   border-radius: 12px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
   min-width: 160px;
   flex: 1;
   max-width: 250px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: box-shadow 0.3s, transform 0.3s;
   overflow: hidden;
+  border: 1px solid #eaeaea;
 }
 
 .control-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.10);
 }
 
 .control-card label {
   display: block;
-  font-weight: 600;
-  color: #2c3e50;
+  font-weight: 500;
+  color: #555;
   margin-bottom: 0.8rem;
-  font-size: 0.9rem;
-  text-transform: uppercase;
+  font-size: 0.95rem;
+  text-transform: none;
   letter-spacing: 0.5px;
+  text-shadow: none;
 }
 
 .control-card select {
@@ -172,18 +178,20 @@
 .refresh-btn {
   width: 100%;
   padding: 0.8rem 1.2rem;
-  background: #FF6900;
-  color: white;
+  background: linear-gradient(90deg, #eaeaea 60%, #f7f7f7 100%);
+  color: #222;
   border: none;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.3s, box-shadow 0.3s;
   margin-top: 1.7rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .refresh-btn:hover:not(:disabled) {
-  background: #e55a00;
+  background: linear-gradient(90deg, #f2f2f2 0%, #eaeaea 100%);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.10);
 }
 
 .refresh-btn:disabled {
@@ -543,19 +551,21 @@
 }
 
 .metric-card {
-  background: white;
+  background: linear-gradient(120deg, #fff 80%, #f2f2f2 100%);
+  color: #222;
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
   display: flex;
   align-items: center;
   gap: 1rem;
-  transition: transform 0.2s ease;
-  border-left: 4px solid #e1e8ed;
+  transition: box-shadow 0.3s, transform 0.3s;
+  border-left: 3px solid #eaeaea;
 }
 
 .metric-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.10);
 }
 
 .metric-card.primary {
@@ -576,16 +586,18 @@
 
 .metric-content h3 {
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 600;
   margin: 0;
-  color: #2c3e50;
+  color: #222;
+  text-shadow: none;
 }
 
 .metric-content p {
   margin: 0.2rem 0 0.5rem 0;
-  color: #7f8c8d;
-  font-size: 0.9rem;
-  font-weight: 500;
+  color: #888;
+  font-size: 0.95rem;
+  font-weight: 400;
+  text-shadow: none;
 }
 
 .metric-change {
@@ -612,18 +624,23 @@
   grid-template-columns: 2fr 1fr;
   gap: 2rem;
   padding: 0 2rem 2rem;
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .chart-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  background: #fff;
+  color: #222;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   overflow: hidden;
+  border: 1px solid #eaeaea;
 }
 
 .chart-header {
   padding: 1.5rem 1.5rem 1rem;
-  border-bottom: 1px solid #f1f3f4;
+  border-bottom: 1px solid #eaeaea;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -631,9 +648,10 @@
 
 .chart-header h3 {
   margin: 0;
-  color: #2c3e50;
+  color: #222;
   font-weight: 600;
   font-size: 1.1rem;
+  text-shadow: none;
 }
 
 .chart-legend {
@@ -645,19 +663,23 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem;
-  color: #7f8c8d;
+  font-size: 0.95rem;
+  color: #888;
+  font-weight: 400;
 }
 
 .legend-color {
   width: 12px;
   height: 12px;
   border-radius: 2px;
+  box-shadow: none;
 }
 
 .chart-container {
   padding: 1rem 1.5rem 1.5rem;
   height: 300px;
+  background: none;
+  border-radius: 0;
 }
 
 .side-chart .chart-container {
@@ -687,15 +709,17 @@
 /* Data Table Section */
 .data-table-section {
   margin: 2rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  background: #fff;
+  color: #222;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   overflow: hidden;
+  border: 1px solid #eaeaea;
 }
 
 .table-header {
   padding: 1.5rem;
-  border-bottom: 1px solid #f1f3f4;
+  border-bottom: 1px solid #eaeaea;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -703,23 +727,26 @@
 
 .table-header h3 {
   margin: 0;
-  color: #2c3e50;
+  color: #222;
   font-weight: 600;
+  text-shadow: none;
 }
 
 .export-btn {
-  background: #FF6900;
-  color: white;
+  background: linear-gradient(90deg, #eaeaea 60%, #f7f7f7 100%);
+  color: #222;
   border: none;
   padding: 0.6rem 1.2rem;
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.3s, box-shadow 0.3s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .export-btn:hover {
-  background: #e55a00;
+  background: linear-gradient(90deg, #f2f2f2 0%, #eaeaea 100%);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.10);
 }
 
 .table-container {
