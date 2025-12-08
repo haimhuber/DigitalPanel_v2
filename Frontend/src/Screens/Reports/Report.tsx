@@ -1,7 +1,7 @@
 import './Report.css';
 import { useEffect, useRef, useState } from "react";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import autoTable from "jspdf-autotable";
 import { getAlerts, getBreakerNames } from "../../Types/CombinedData";
 import type { AlertInterface } from "../../Types/Alerts";
 import { breakerDataList } from '../../Types/digitalPanel';
@@ -149,22 +149,66 @@ const Report = () => {
   };
 
   const generatePDF = () => {
-    const now = new Date();
-    const date = now.toISOString().slice(0, 10);
-    const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    const dateTime = `${date} ${time}`;
+    try {
+      const doc = new jsPDF();
 
-    const element = reportRef.current;
-    if (!element) return;
+      // ABB Logo
+      doc.setFillColor(227, 30, 36);
+      doc.rect(22, 12, 16, 16, 'F');
+      doc.setFontSize(8);
+      doc.setTextColor(255, 255, 255);
+      doc.text('ABB', 26, 22);
 
-    html2canvas(element, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`report_${dateTime}.pdf`);
-    });
+      // Header
+      doc.setFontSize(20);
+      doc.setTextColor(30, 62, 80);
+      doc.text('Switch Report', 50, 25);
+
+      doc.setFontSize(12);
+      doc.setTextColor(127, 140, 141);
+      doc.text('ABB Smart Power Digital Solutions - Site Caesarea', 20, 35);
+
+      // Report details
+      doc.setFontSize(10);
+      doc.setTextColor(44, 62, 80);
+      doc.text(`Report Period: ${startDate} - ${endDate}`, 20, 50);
+      doc.text(`Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString('en-GB', { hour12: false })}`, 20, 58);
+
+      // Summary
+      doc.setFillColor(248, 249, 250);
+      doc.rect(20, 65, 170, 25, 'F');
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Summary:', 25, 75);
+      doc.setFont('helvetica', 'normal');
+      const breakerInfo = breakerList.find(b => b.id == selectedBreaker);
+      doc.text(`Breaker: ${breakerInfo?.name || 'All'}`, 25, 83);
+      doc.text(`Data Type: ${breakerDataPick || 'Not Selected'}`, 100, 83);
+      doc.text(`Rows: ${switchReportData.length}`, 25, 91);
+
+      // Table data (limit to 20 rows)
+      const tableData = switchReportData.slice(0, 20).map((row) => [
+        breakerInfo?.name || 'All',
+        breakerInfo?.type || '--',
+        breakerInfo?.load ?? '--',
+        breakerDataPick,
+        breakerDataPick === 'ActiveEnergy' ? row.ActiveEnergy : row.ActivePower,
+        new Date(row.timestamp).toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem' })
+      ]);
+
+      autoTable(doc, {
+        head: [['Breaker', 'Type', 'Load', 'Data Type', 'Value', 'Timestamp']],
+        body: tableData,
+        startY: 100,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [255, 105, 0] }
+      });
+
+      const fileName = `Switch_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
+    } catch (error) {
+      alert('Error generating PDF. Please try again.');
+    }
   };
 
   function setAlert() {
@@ -409,6 +453,8 @@ const Report = () => {
                     <tr>
                       <th>Breaker ID</th>
                       <th>Name</th>
+                      <th>Type</th>
+                      <th>Load</th>
                       <th>Data Type</th>
                       <th>Value</th>
                       <th>Timestamp</th>
@@ -418,11 +464,12 @@ const Report = () => {
                     {switchReportData
                       .map((row, index) => {
                         const breakerInfo = breakerList.find(b => b.id == selectedBreaker);
-
                         return (
                           <tr key={index}>
-                            <td>{selectedBreaker}</td>
+                            <td style={{ minWidth: '90px', maxWidth: '80px', width: '60px', textAlign: 'center' }}>{selectedBreaker}</td>
                             <td>{breakerInfo?.name || `Q${selectedBreaker}`}</td>
+                            <td>{breakerInfo?.type || '--'}</td>
+                            <td>{breakerInfo?.load ?? '--'}</td>
                             <td>
                               <span className="rate-badge standard">{breakerDataPick}</span>
                             </td>
