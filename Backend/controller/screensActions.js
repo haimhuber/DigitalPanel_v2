@@ -81,21 +81,6 @@ const breakersNames = async (req, res) => {
 };
 
 
-// const login = async (req, res) => {
-//     const { username, password } = req.body;
-
-//     if (username !== userDB.username)
-//         return res.status(401).json({ message: "Invalid username" });
-
-//     const match = await bcrypt.compare(password, userDB.passwordHash);
-//     if (!match) return res.status(401).json({ message: "Invalid password" });
-
-//     const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: "1h" });
-
-//     res.json({ token });
-// };
-
-
 const addingUser = async (req, res) => {
     const { username, password, email } = req.body;
     const userData = { username, password, email };
@@ -209,9 +194,9 @@ const breakersPositionStatus = async (req, res) => {
 
 
 const auditTrail = async (req, res) => {
-    const { usernameAudit, type } = req.body;
+    const { username, type } = req.body;
     try {
-        const audit = await sqlData.AuditTrail(usernameAudit, type);
+        const audit = await sqlData.AuditTrail(username, type);
         res.status(200).json(audit); // Return -> true / false
     } catch (err) {
         console.error('Error  inserting audit trail:', err);

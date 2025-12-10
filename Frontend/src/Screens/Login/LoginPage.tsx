@@ -154,13 +154,13 @@ const Login = () => {
 
       // ---- Audit Log ----
       try {
-        const usernameAudit = sessionStorage.getItem("username");
+        const username = sessionStorage.getItem("username");
         const type = "login";
 
         await fetch(API_ENDPOINTS.audit, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ usernameAudit, type })
+          body: JSON.stringify({ username, type })
         });
       } catch (err) {
         console.error("Audit error:", err);
