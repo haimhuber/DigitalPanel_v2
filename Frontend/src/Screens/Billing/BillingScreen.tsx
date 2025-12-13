@@ -82,20 +82,19 @@ export const BillingScreen = () => {
     const seasonKey = getSeasonKey(date);
     const seasonRates = tariffRates[seasonKey] || { peakRate: 0, offPeakRate: 0 };
     const dayOfWeek = date.getDay();
+    const month = date.getMonth() + 1;
     const weekend = isWeekend(dayOfWeek);
 
     let peakHours = 0;
     let peakHoursLabel = 'No peak';
     let offPeakHoursLabel = 'All hours';
 
-
-    // שימוש בפונקציה הפשוטה
-    const peakEnd = getPeakEndHour(date);
-    if (peakEnd === 0) {
+    // בקיץ/אביב/סתיו בלבד, סופ"ש = אין פיק
+    if (((month >= 6 && month <= 9) || (month >= 3 && month <= 5) || (month >= 10 && month <= 11)) && (dayOfWeek === 5 || dayOfWeek === 6)) {
       peakHours = 0;
       peakHoursLabel = 'No peak (Fri/Sat)';
       offPeakHoursLabel = 'All hours (24:00)';
-    } else if (peakEnd === 23) {
+    } else if (month >= 6 && month <= 9) {
       peakHours = 6;
       peakHoursLabel = '17:00-23:00';
       offPeakHoursLabel = '00:00-17:00 and 23:00-24:00';
@@ -106,22 +105,10 @@ export const BillingScreen = () => {
     }
 
     const offPeakHours = 24 - peakHours;
-      const effectiveRate = weekend
-        ? seasonRates.offPeakRate
-        : ((peakHours / 24) * seasonRates.peakRate) + ((offPeakHours / 24) * seasonRates.offPeakRate);
-
-      return {
-        seasonKey,
-        seasonLabel: getSeasonLabel(seasonKey),
-        peakRate: seasonRates.peakRate,
-        offPeakRate: seasonRates.offPeakRate,
-        peakHoursLabel,
-        offPeakHoursLabel,
-        effectiveRate,
-        isWeekend: weekend,
-        peakHours,
-        offPeakHours
-      };
+    // חישוב תעריף אפקטיבי: רק בקיץ/אביב/סתיו בסופ"ש - הכל שפל
+    const effectiveRate = (((month >= 6 && month <= 9) || (month >= 3 && month <= 5) || (month >= 10 && month <= 11)) && (dayOfWeek === 5 || dayOfWeek === 6))
+      ? seasonRates.offPeakRate
+      : ((peakHours / 24) * seasonRates.peakRate) + ((offPeakHours / 24) * seasonRates.offPeakRate);
 
     return {
       seasonKey,
@@ -217,8 +204,8 @@ export const BillingScreen = () => {
     const month = date.getMonth() + 1;
     const dayOfWeek = date.getDay();
     let peakHours: number[] = [];
-    if (dayOfWeek === 5 || dayOfWeek === 6) {
-      // weekend: הכל שפל
+    // בקיץ/אביב/סתיו בלבד, סופ"ש הכל שפל
+    if (((month >= 6 && month <= 9) || (month >= 3 && month <= 5) || (month >= 10 && month <= 11)) && (dayOfWeek === 5 || dayOfWeek === 6)) {
       return { peak: 0, offpeak: hourly.reduce((a, b) => a + b, 0), isEstimated: hourly.length !== 24 };
     }
     if (month >= 6 && month <= 9) {
