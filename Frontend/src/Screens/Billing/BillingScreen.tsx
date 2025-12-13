@@ -967,27 +967,12 @@ export const BillingScreen = () => {
               {consumptionData.map((item, index) => (
                 <tr
                   key={index}
-                  title={
-                    item.isEstimated === true
-                      ? 'Estimated data – not all 24 hourly samples available'
-                      : (Array.isArray(item.hourly_consumption) && item.hourly_consumption.length === 24)
-                        ? 'Complete data – all 24 hourly samples available'
-                        : ''
-                  }
+                 
                 >
                   <td>
                     {item.isEstimated === true ? (
                       <span
-                        style={{
-                          display: 'inline-block',
-                          width: 8,
-                          height: 8,
-                          borderRadius: '50%',
-                          background: 'red',
-                          marginRight: 6,
-                          verticalAlign: 'middle'
-                        }}
-                        title="Estimated data – not all 24 hourly samples available"
+                        
                       ></span>
                     ) : (Array.isArray(item.hourly_consumption) && item.hourly_consumption.length === 24) ? (
                       <span
