@@ -10,12 +10,11 @@ export const Logout = () => {
     async function logout() {
       const username = sessionStorage.getItem("username");
       try {
-        const usernameAudit = sessionStorage.getItem('username');
         const type = "logout";
         const res = await fetch("api/audit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ usernameAudit, type })
+          body: JSON.stringify({ username, type })
         });
         const data = await res.json();
         console.log(data);

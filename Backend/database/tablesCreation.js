@@ -3,6 +3,22 @@ const database = 'DigitalPanel';
 const checkIfNeedsToDelete = require('./deleteTables');
 
 async function createTables() {
+    // 3️⃣ DailyConsumptionSummary
+    await pool.request().query(`
+      IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DailyConsumptionSummary' AND xtype='U')
+      CREATE TABLE DailyConsumptionSummary (
+          id INT IDENTITY PRIMARY KEY,
+          switch_id INT NOT NULL,
+          consumption_date DATE NOT NULL,
+          peak_consumption FLOAT DEFAULT 0,
+          offpeak_consumption FLOAT DEFAULT 0,
+          total_consumption AS (peak_consumption + offpeak_consumption) PERSISTED,
+          cost FLOAT DEFAULT 0,
+          last_update DATETIME DEFAULT GETDATE(),
+          CONSTRAINT UQ_SwitchDate UNIQUE (switch_id, consumption_date)
+      )
+    `);
+    console.log({ 'DailyConsumptionSummary table created (if not exists)': 200 });
   const checkState = await checkIfNeedsToDelete.deleteAllTables();
 
   if (!checkState) {

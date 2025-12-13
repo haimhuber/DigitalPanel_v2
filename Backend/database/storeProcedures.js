@@ -3,6 +3,30 @@ const checkDelete = require('./deleteTables');
 const database = 'DigitalPanel';
 
 async function createSp() {
+                // יצירת SP לסיכום יומי של צריכה
+                await pool.request().query(`
+                CREATE OR ALTER PROCEDURE SummarizeDailyConsumption
+                    @targetDate DATE
+                AS
+                BEGIN
+                    SET NOCOUNT ON;
+
+                    -- מחיקת נתונים קיימים לאותו יום (אם רוצים לאפשר עדכון)
+                    DELETE FROM DailyConsumptionSummary WHERE consumption_date = @targetDate;
+
+                    -- הכנסת סיכום יומי לכל מפסק (דוגמה בסיסית, יש להתאים לשמות טבלאות/שדות בפועל)
+                    INSERT INTO DailyConsumptionSummary (switch_id, consumption_date, peak_consumption, offpeak_consumption, cost)
+                    SELECT
+                        h.switch_id,
+                        @targetDate,
+                        SUM(CASE WHEN DATEPART(HOUR, h.timestamp) BETWEEN 17 AND 21 THEN h.consumption ELSE 0 END) AS peak_consumption,
+                        SUM(CASE WHEN DATEPART(HOUR, h.timestamp) NOT BETWEEN 17 AND 21 THEN h.consumption ELSE 0 END) AS offpeak_consumption,
+                        SUM(CASE WHEN DATEPART(HOUR, h.timestamp) BETWEEN 17 AND 21 THEN h.consumption * 1.21 ELSE h.consumption * 0.46 END) AS cost
+                    FROM HourlyConsumption h
+                    WHERE CAST(h.timestamp AS DATE) = @targetDate
+                    GROUP BY h.switch_id;
+                END
+                `);
     try {
         const pool = await connectDb.connectionToSqlDB(database);
         await pool.request().query(`

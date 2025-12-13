@@ -166,6 +166,24 @@ export const BillingScreen = () => {
         if (rates.length > 0) {
           setEfficiencyBase(rates[0].efficiencyBase || 50);
           setEfficiencyMultiplier(rates[0].efficiencyMultiplier || 2);
+          // Update tariffRates context from DB
+          const summer = rates.find((r: any) => r.season === 'Summer') || {};
+          const winter = rates.find((r: any) => r.season === 'Winter') || {};
+          const springAutumn = rates.find((r: any) => r.season === 'Spring/Autumn') || {};
+          setTariffRates({
+            summer: {
+              peakRate: Number(summer.peakRate ?? 0),
+              offPeakRate: Number(summer.offPeakRate ?? 0)
+            },
+            winter: {
+              peakRate: Number(winter.peakRate ?? 0),
+              offPeakRate: Number(winter.offPeakRate ?? 0)
+            },
+            springAutumn: {
+              peakRate: Number(springAutumn.peakRate ?? 0),
+              offPeakRate: Number(springAutumn.offPeakRate ?? 0)
+            }
+          });
         }
       }
     } catch (err) {
@@ -204,8 +222,8 @@ export const BillingScreen = () => {
     const month = date.getMonth() + 1;
     const dayOfWeek = date.getDay();
     let peakHours: number[] = [];
-    // בקיץ/אביב/סתיו בלבד, סופ"ש הכל שפל
-    if (((month >= 6 && month <= 9) || (month >= 3 && month <= 5) || (month >= 10 && month <= 11)) && (dayOfWeek === 5 || dayOfWeek === 6)) {
+    if (dayOfWeek === 5 || dayOfWeek === 6) {
+      // weekend: הכל שפל
       return { peak: 0, offpeak: hourly.reduce((a, b) => a + b, 0), isEstimated: hourly.length !== 24 };
     }
     if (month >= 6 && month <= 9) {
@@ -215,11 +233,40 @@ export const BillingScreen = () => {
       // חורף/אביב/סתיו: 17:00-22:00
       peakHours = [17, 18, 19, 20, 21];
     }
-    let peak = 0, offpeak = 0;
-    for (let h = 0; h < hourly.length; h++) {
-      if (peakHours.includes(h)) peak += hourly[h];
-      else offpeak += hourly[h];
+    // תיקון: עבור היום הנוכחי, לחשב רק עד השעה הנוכחית
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+    let lastHour = 23;
+    if (isToday) {
+      lastHour = now.getHours();
     }
+    // חישוב הפרשים שעתיים
+    const hourlyDiffs: number[] = [];
+    for (let i = 0; i < hourly.length; i++) {
+      const diff = i === 0 ? hourly[0] : hourly[i] - hourly[i - 1];
+      hourlyDiffs.push(diff);
+    }
+    let peak = 0, offpeak = 0;
+    for (let h = 0; h < hourly.length && h <= lastHour; h++) {
+      const consumption = hourlyDiffs[h];
+      // אם השעה הנוכחית לפני תחילת הפיק, כל הצריכה היא אוף-פיק
+      if (isToday && now.getHours() < peakHours[0]) {
+        offpeak += consumption;
+        console.log(`Hour: ${h}, Consumption: ${consumption}, Off-Peak (before peak start)`);
+      } else {
+        if (peakHours.includes(h) && h <= now.getHours()) {
+          peak += consumption;
+          console.log(`Hour: ${h}, Consumption: ${consumption}, Peak`);
+        } else {
+          offpeak += consumption;
+          console.log(`Hour: ${h}, Consumption: ${consumption}, Off-Peak`);
+        }
+      }
+    }
+    // לוגים לסיכום
+    console.log('Hourly diffs:', hourlyDiffs);
+    console.log('Peak Consumption:', peak);
+    console.log('Off-Peak Consumption:', offpeak);
     // אם אין 24 שעות - זה משוער
     return { peak, offpeak, isEstimated: hourly.length !== 24 };
   };
@@ -230,8 +277,13 @@ export const BillingScreen = () => {
     try {
       const response = await fetch(API_ENDPOINTS.consumption(selectedBreaker, startDate, endDate));
       const result = await response.json();
+      console.log('API result:', result);
 
       if (result.status === 200 && result.data) {
+        // לוג לכל יום שמתקבל
+        result.data.forEach((item: ConsumptionData) => {
+          console.log('Day:', item.consumption_date, 'hourly_consumption:', item.hourly_consumption);
+        });
         // Add peak/off-peak calculation to each row
         const processed = result.data.map((item: ConsumptionData) => {
           const date = new Date(item.consumption_date);
@@ -447,7 +499,7 @@ export const BillingScreen = () => {
       }
 
       // Helper to get DB row by season
-      const getDbRow = (seasonLabel) => rates.find(r => r.season === seasonLabel) || {};
+  const getDbRow = (seasonLabel: string) => rates.find((r: any) => r.season === seasonLabel) || {};
       const currentUser = localStorage.getItem('user') || 'Admin';
 
       // Build full payload for each season
@@ -650,16 +702,16 @@ export const BillingScreen = () => {
             const dbRates = data.data;
             const newRates = {
               summer: {
-                peakRate: Number(dbRates.find(r => r.season === 'Summer')?.peakRate ?? 1.6895),
-                offPeakRate: Number(dbRates.find(r => r.season === 'Summer')?.offPeakRate ?? 0.5283)
+                peakRate: Number(dbRates.find((r: any) => r.season === 'Summer')?.peakRate ?? 1.6895),
+                offPeakRate: Number(dbRates.find((r: any) => r.season === 'Summer')?.offPeakRate ?? 0.5283)
               },
               winter: {
-                peakRate: Number(dbRates.find(r => r.season === 'Winter')?.peakRate ?? 1.2071),
-                offPeakRate: Number(dbRates.find(r => r.season === 'Winter')?.offPeakRate ?? 0.4557)
+                peakRate: Number(dbRates.find((r: any) => r.season === 'Winter')?.peakRate ?? 1.2071),
+                offPeakRate: Number(dbRates.find((r: any) => r.season === 'Winter')?.offPeakRate ?? 0.4557)
               },
               springAutumn: {
-                peakRate: Number(dbRates.find(r => r.season === 'Spring/Autumn')?.peakRate ?? 0.4977),
-                offPeakRate: Number(dbRates.find(r => r.season === 'Spring/Autumn')?.offPeakRate ?? 0.446)
+                peakRate: Number(dbRates.find((r: any) => r.season === 'Spring/Autumn')?.peakRate ?? 0.4977),
+                offPeakRate: Number(dbRates.find((r: any) => r.season === 'Spring/Autumn')?.offPeakRate ?? 0.446)
               }
             };
             setTariffRates(newRates);

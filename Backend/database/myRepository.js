@@ -458,9 +458,9 @@ async function AuditTrail(userName, type) {
     const pool = await connectDb.connectionToSqlDB();
 
     const result = await pool.request()
-      .input('userName', sql.VarChar, userName)
+      .input('username', sql.VarChar, userName)
       .input('type', sql.VarChar, type)
-      .execute('AddUserAudit');
+      .query(`INSERT INTO UserAuditTrail (username, action) VALUES (@username, @type); SELECT 1 AS success;`);
 
     if (!result.recordset || result.recordset.length === 0) {
       return { status: 404, data: false };

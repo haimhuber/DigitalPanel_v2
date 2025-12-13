@@ -193,10 +193,14 @@ export const Setting = () => {
   // GET AUDIT TRAIL
   const fetchAuditData = async () => {
     setLoading(true);
+    console.log("Username: ", sessionStorage.getItem("username"));
+    
     try {
       const req = await fetch(API_ENDPOINTS.audit);
       const response = await req.json();
       let data = response.data || [];
+      console.log({AuditData: response.data});
+      
 
       // Filter by date range if dates are selected
       if (startDate && endDate) {
@@ -486,7 +490,7 @@ export const Setting = () => {
                   {auditData.map((row, i) => (
                     <tr key={i}>
                       <td>{i + 1}</td>
-                      <td>{row.userName}</td>
+                      <td>{row.username || ''}</td>
                       <td>
                         <span className="rate-badge standard">{row.type}</span>
                       </td>
