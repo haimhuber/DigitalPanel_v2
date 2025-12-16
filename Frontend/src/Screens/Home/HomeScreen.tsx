@@ -196,16 +196,25 @@ export const HomeScreen: React.FC = () => {
 
     return () => clearInterval(efficiencyInterval);
   }, [combinedDataState]);  // Format timestamp to DD-MM-YYYY HH:MM
-  const formatTimestamp = (timestamp: string) => {
-    if (!timestamp) return 'N/A';
-    const date = new Date(timestamp);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${day}-${month}-${year} ${hours}:${minutes}`;
-  };
+  const formatTimestamp = (timestamp?: string) => {
+  if (!timestamp) return 'N/A';
+
+  // אם הגיע ISO עם Z – ננטרל את ה-UTC
+  const fixedTimestamp = timestamp.endsWith('Z')
+    ? timestamp.replace('Z', '')
+    : timestamp;
+
+  const date = new Date(fixedTimestamp);
+
+  return date.toLocaleString('he-IL', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).replace(',', '');
+};
+
 
   // Get protection status for display
   const getProtectionStatus = () => {
