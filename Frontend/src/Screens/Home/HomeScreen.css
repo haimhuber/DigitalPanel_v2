@@ -103,15 +103,15 @@
 
 .status-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
 }
 
 .status-card.closed {
-  border-top: 3px solid #10b981;
+  border-top: 3px solid #ef4444;
 }
 
 .status-card.open {
-  border-top: 3px solid #f59e0b;
+  border-top: 3px solid#10b981;
 }
 
 .status-card.comm-error {
@@ -119,7 +119,7 @@
 }
 
 .status-card.tripped {
-  border-top: 3px solid #ef4444;
+  border-top: 3px solid  #d2eb4a;
 }
 
 .status-emoji {
@@ -227,7 +227,7 @@
 .breaker-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(227, 30, 36, 0.2);
-  border-left-color: #E31E24;
+  border-left-color: #181314;
   background: linear-gradient(135deg, #fff 0%, #fef2f2 100%);
 }
 

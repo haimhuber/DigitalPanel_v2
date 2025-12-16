@@ -461,13 +461,13 @@ export const HomeScreen: React.FC = () => {
             <div className="status-card closed">
               <div className="status-emoji">🔒</div>
               <div className="status-number">{closedBreakers}</div>
-              <div className="status-label">Closed</div>
+              <div className="status-label">Close 🔴</div>
             </div>
 
             <div className="status-card open">
               <div className="status-emoji">🔓</div>
               <div className="status-number">{openBreakers}</div>
-              <div className="status-label">Open</div>
+              <div className="status-label">Open 🟢</div>
             </div>
 
             <div className="status-card comm-error">
@@ -603,7 +603,7 @@ export const HomeScreen: React.FC = () => {
               <div className="info-row">
                 <span>Position:</span>
                 <span className={breaker.Tripped ? 'status-error' : breaker.BreakerClose ? 'status-ok' : 'status-error'}>
-                  {breaker.Tripped ? 'Tripped' : breaker.BreakerClose ? 'Closed' : 'Open'}
+                  {breaker.Tripped ? 'Tripped' : breaker.BreakerClose ? 'Close 🔴' : 'Open 🟢'}
                 </span>
               </div>
               <div className="info-row">
