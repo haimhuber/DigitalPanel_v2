@@ -258,7 +258,7 @@ const Report = () => {
             onClick={toggleSwitchReport}
             style={{ fontSize: '0.85rem', padding: '0.5rem 1rem', height: '36px', margin: 0 }}
           >
-            ⚡ Switch
+            ⚡ Switches
           </button>
         </div>
 
@@ -379,7 +379,7 @@ const Report = () => {
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>Alarm ID</th>
+                    <th>Breaker Name</th>
                     <th>Type</th>
                     <th>Message</th>
                     <th>Status</th>
@@ -393,24 +393,28 @@ const Report = () => {
                       const alertDate = new Date(alert.timestamp).toISOString().split('T')[0];
                       return alertDate >= startDate && alertDate <= endDate;
                     })
-                    .map((alert) => (
-                      <tr key={alert.id}>
-                        <td>{alert.id}</td>
-                        <td>{alert.alarmId}</td>
-                        <td>
-                          <span className="rate-badge standard">{alert.alarmType}</span>
-                        </td>
-                        <td>{alert.alarmMessage}</td>
-                        <td>
-                          <span className={`rate-badge ${alert.alertAck ? 'off-peak' : 'peak'}`}>
-                            {alert.alertAck ? "✓ ACK" : "⚠ Not Ack"}
-                          </span>
-                        </td>
-                        <td className="timestamp-cell">
-                          {formatTimestamp(alert.timestamp)}
-                        </td>
-                      </tr>
-                    ))}
+                    .map((alert) => {
+                      const breakerInfo = breakerList.find(b => b.id == alert.alarmId);
+                      const breakerName = breakerInfo?.name || alert.alarmId;
+                      return (
+                        <tr key={alert.id}>
+                          <td>{alert.id}</td>
+                          <td>{breakerName}</td>
+                          <td>
+                            <span className="rate-badge standard">{alert.alarmType}</span>
+                          </td>
+                          <td>{alert.alarmMessage}</td>
+                          <td>
+                            <span className={`rate-badge ${alert.alertAck ? 'off-peak' : 'peak'}`}>
+                              {alert.alertAck ? "✓ ACK" : "⚠ Not Ack"}
+                            </span>
+                          </td>
+                          <td className="timestamp-cell">
+                            {formatTimestamp(alert.timestamp)}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   {(Array.isArray(data) ? data : []).length === 0 && (
                     <tr>
                       <td colSpan={6} style={{ textAlign: 'center', color: '#888', fontStyle: 'italic' }}>
