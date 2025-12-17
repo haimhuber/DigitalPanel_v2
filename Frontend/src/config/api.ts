@@ -2,24 +2,9 @@
 // Automatically detects server IP dynamically
 
 // Default fallback IP (used during initial load)
-let cachedServerUrl = 'http://localhost:5500';
+// let cachedServerUrl = 'http://192.168.1.148:5500';
+const cachedServerUrl = `${window.location.protocol}//${window.location.hostname}:5500`;
 
-// Function to fetch server IP dynamically from the server
-export const initializeServerUrl = async (): Promise<string> => {
-    try {
-        // Use current hostname and protocol for network compatibility
-        const apiUrl = `${window.location.protocol}//${window.location.hostname}:5500/api/server-ip`;
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        if (data.status === 200 && data.ip) {
-            cachedServerUrl = `http://${data.ip}:${data.port || 5500}`;
-        }
-    } catch (error) {
-        // Silently use fallback URL
-        console.log('Using localhost fallback');
-    }
-    return cachedServerUrl;
-};
 
 // Get current server URL (call initializeServerUrl first in App.tsx)
 export const getServerUrl = () => cachedServerUrl;

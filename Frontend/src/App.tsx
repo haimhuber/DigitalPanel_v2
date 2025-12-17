@@ -3,7 +3,7 @@ import { lazy, Suspense, useState, useEffect } from 'react'
 import './App.css'
 import { useAuth, useAlerts, useTime } from './contexts';
 import { TariffProvider, useTariff } from './contexts/TariffContext';
-import { initializeServerUrl } from './config/api';
+
 
 const HomeScreen = lazy(() => import('./Screens/Home/HomeScreen').then(m => ({ default: m.HomeScreen })));
 
@@ -24,11 +24,7 @@ function AppContent() {
   const [, forceUpdate] = useState({});
   const { tariffRates } = useTariff();
 
-  // Initialize server URL on app start
-  useEffect(() => {
-    initializeServerUrl();
-  }, []);
-
+ 
   // רענון אוטומטי בתחילת כל שעה עגולה לעדכון תעריפים
   useEffect(() => {
     const scheduleNextUpdate = () => {

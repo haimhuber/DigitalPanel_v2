@@ -98,49 +98,42 @@ export const HomeScreen: React.FC = () => {
   // Calculate efficiency (Load Factor) based on average current vs nominal current
   const calculateEfficiency = async (switchId: number, targetLoadFactor: number, breaker?: any) => {
     try {
-      console.log(`🔍 FLOW 1: Fetching data for switch_id=${switchId}, targetLoadFactor=${targetLoadFactor.toFixed(2)}%`);
-      console.log(`🔍 FLOW 2: API URL = ${API_ENDPOINTS.activePower(switchId)}`);
+     
 
       const response = await fetch(API_ENDPOINTS.activePower(switchId));
-      console.log(`🔍 FLOW 2.5: Response status = ${response.status}, statusText = ${response.statusText}`);
+     
 
       if (!response.ok) {
-        console.log(`🔍 FLOW ERROR: HTTP error! status: ${response.status}`);
+        
         return { avg: 0, efficiency: 0 };
       }
 
       const result = await response.json();
 
-      console.log(`🔍 FLOW 3: API Response =`, result);
-      console.log(`🔍 FLOW 4: result.status = ${result.status}`);
-      console.log(`🔍 FLOW 5: result.data = `, result.data);
-      console.log(`🔍 FLOW 6: result.data?.length = ${result.data?.length}`);
-
       // The API already returns only last 2 days from SP 'GetLast2DaysActivePower'
       if (result.status === 200 && result.data && result.data.length > 0) {
-        console.log(`🔍 FLOW 7: Data received from last 2 days at current hour`);
+        
 
         const recentData = result.data;
 
-        console.log(`🔍 FLOW 8: recentData.length = ${recentData.length}`);
+      
 
         // Calculate average Active Power
         const sum = recentData.reduce((acc: number, item: any) => acc + (item.ActivePower || 0), 0);
         const avgPower = sum / recentData.length;
 
-        console.log(`🔍 FLOW 10: sum = ${sum}, avgPower = ${avgPower}`);
+      
 
         // Load Factor is already calculated from current, so we just return it
         const efficiency = Math.min(targetLoadFactor, 100); // Cap at 100%
 
-        console.log(`🔍 FLOW 11: efficiency (Load Factor) = ${efficiency}%`);
-        console.log(`🔍 FLOW 12: FINAL RESULT = { avg: ${avgPower}, efficiency: ${efficiency} }`);
+
 
         return { avg: avgPower, efficiency: efficiency };
       }
 
-      // FALLBACK: Use current Load Factor if no historical data
-      console.log(`🔍 FLOW 13: NO HISTORICAL DATA - Using current Load Factor as fallback`);
+
+     
 
       // Use the breaker object passed to the function
       if (breaker) {
