@@ -335,12 +335,6 @@ export const HomeScreen: React.FC = () => {
             data: energyData,
             borderColor: '#FF6900',
             backgroundColor: '#FF690020'
-          },
-          {
-            label: 'Frequency (Hz)',
-            data: Array.from({ length: numDays }, () => (selectedBreaker.Frequency || 50) + (Math.random() - 0.5) * 1),
-            borderColor: '#00A8CC',
-            backgroundColor: '#00A8CC20'
           }
         ];
         break;
@@ -674,7 +668,7 @@ export const HomeScreen: React.FC = () => {
                   <option value="voltage">Voltages (V12,V23,V31)</option>
                   <option value="current">Currents (I1,I2,I3)</option>
                   <option value="power">Power (Active/Apparent/Reactive)</option>
-                  <option value="energy">Energy & Frequency</option>
+                  <option value="energy">Active Energy</option>
                   <option value="efficiency">Efficiency (Daily Average %)</option>
                 </select>
               </div>

@@ -67,6 +67,8 @@ const Report = () => {
         })
       });
       const result = await response.json();
+      console.log("data:", result.data);
+      
 
       // Filter data based on sample type
       let filteredData = result.data || [];

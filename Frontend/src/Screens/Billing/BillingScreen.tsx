@@ -252,21 +252,18 @@ export const BillingScreen = () => {
       // אם השעה הנוכחית לפני תחילת הפיק, כל הצריכה היא אוף-פיק
       if (isToday && now.getHours() < peakHours[0]) {
         offpeak += consumption;
-        console.log(`Hour: ${h}, Consumption: ${consumption}, Off-Peak (before peak start)`);
+       
       } else {
         if (peakHours.includes(h) && h <= now.getHours()) {
           peak += consumption;
-          console.log(`Hour: ${h}, Consumption: ${consumption}, Peak`);
+        
         } else {
           offpeak += consumption;
-          console.log(`Hour: ${h}, Consumption: ${consumption}, Off-Peak`);
+       
         }
       }
     }
-    // לוגים לסיכום
-    console.log('Hourly diffs:', hourlyDiffs);
-    console.log('Peak Consumption:', peak);
-    console.log('Off-Peak Consumption:', offpeak);
+   
     // אם אין 24 שעות - זה משוער
     return { peak, offpeak, isEstimated: hourly.length !== 24 };
   };
@@ -277,12 +274,12 @@ export const BillingScreen = () => {
     try {
       const response = await fetch(API_ENDPOINTS.consumption(selectedBreaker, startDate, endDate));
       const result = await response.json();
-      console.log('API result:', result);
+     
 
       if (result.status === 200 && result.data) {
         // לוג לכל יום שמתקבל
         result.data.forEach((item: ConsumptionData) => {
-          console.log('Day:', item.consumption_date, 'hourly_consumption:', item.hourly_consumption);
+         
         });
         // Add peak/off-peak calculation to each row
         const processed = result.data.map((item: ConsumptionData) => {
@@ -930,6 +927,8 @@ export const BillingScreen = () => {
           </div>
         </div>
       </div>
+
+   
 
       <div className="data-table-section">
         <div className="table-header">
