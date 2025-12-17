@@ -535,11 +535,20 @@ export const BillingScreen = () => {
 
       // Send PATCH for each season
       let allOk = true;
+     
       for (const seasonData of fullPayload) {
+        // Only send the required fields for updateTariffRatesOnly
+        const payload = {
+          season: seasonData.season,
+          peakRate: seasonData.peakRate,
+          offPeakRate: seasonData.offPeakRate,
+          updatedBy: currentUser
+        };
+        console.log('Updating tariff rates with payload:', payload);
         const resp = await fetch(API_ENDPOINTS.tariffRates, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(seasonData)
+          body: JSON.stringify(payload)
         });
         if (!resp.ok) allOk = false;
       }
