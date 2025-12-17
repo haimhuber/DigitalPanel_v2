@@ -263,7 +263,7 @@ async function addUser(userData) {
 
     const result = await pool.request()
       .input('userName', sql.VarChar, userData.username)
-      .input('userPassword', sql.VarChar, userData.password)
+      .input('password', sql.VarChar, userData.password)
       .input('userEmail', sql.VarChar, userData.email)
       .execute('AddUser');
     if (!result.recordset || result.recordset.length === 0) {
