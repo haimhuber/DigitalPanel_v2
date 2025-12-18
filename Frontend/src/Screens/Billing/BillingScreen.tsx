@@ -533,27 +533,19 @@ export const BillingScreen = () => {
         }
       ];
 
-      // Send PATCH for each season
-      let allOk = true;
-     
-      for (const seasonData of fullPayload) {
-        // Only send the required fields for updateTariffRatesOnly
-        const payload = {
-          season: seasonData.season,
-          peakRate: seasonData.peakRate,
-          offPeakRate: seasonData.offPeakRate,
-          updatedBy: currentUser
-        };
-        console.log('Updating tariff rates with payload:', payload);
-        const resp = await fetch(API_ENDPOINTS.tariffRates, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!resp.ok) allOk = false;
-      }
-
-      if (efficiencyResponse.ok && allOk) {
+      // Send PATCH for all seasons in one request (as expected by backend)
+      const payload = {
+        summer: { peakRate: summerPeak, offPeakRate: summerOffPeak },
+        winter: { peakRate: winterPeak, offPeakRate: winterOffPeak },
+        springAutumn: { peakRate: springPeak, offPeakRate: springOffPeak }
+      };
+      const resp = await fetch(API_ENDPOINTS.tariffRates, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'current-user': currentUser },
+        body: JSON.stringify(payload)
+      });
+      const result = await resp.json();
+      if (efficiencyResponse.ok && resp.ok && result.status === 200) {
         alert('Settings and tariff rates updated successfully!');
         setShowTariffModal(false);
         fetchRealData(); // Refresh the data
