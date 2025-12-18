@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { API_ENDPOINTS } from '../../config/api';
 
 export const Logout = () => {
   const hasLoggedOut = useRef(false);
@@ -11,7 +12,7 @@ export const Logout = () => {
       const username = sessionStorage.getItem("username");
       try {
         const type = "logout";
-        const res = await fetch("api/audit", {
+        const res = await fetch(API_ENDPOINTS.audit, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, type })
