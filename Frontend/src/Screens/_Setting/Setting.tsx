@@ -89,7 +89,7 @@ export const Setting = () => {
     try {
       const response = await fetch(API_ENDPOINTS.users);
       if (response.ok) {
-        const result = await response.json();
+        const result = await response.json();  
         setUsers(result.data || []);
       } else {
         // Fallback until server restart
@@ -490,7 +490,7 @@ export const Setting = () => {
                   {auditData.map((row, i) => (
                     <tr key={i}>
                       <td>{i + 1}</td>
-                      <td>{row.username || ''}</td>
+                      <td>{row.userName || ''}</td>
                       <td>
                         <span className="rate-badge standard">{row.type}</span>
                       </td>
