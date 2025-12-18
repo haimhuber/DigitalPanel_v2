@@ -127,19 +127,36 @@ const Login = () => {
       }
 
       // ---- Login Success ----
-      setShowAuth(true);
-      setUserEmail(data.userEmail);
+      sessionStorage.setItem("token", "true");
+      sessionStorage.setItem("username", username);
+       // ---- Audit Log ----
       try {
-        const request = await sendEmail(data.userEmail);
-        if (request?.Succsess) {
-          setEmailCode(request.code);
-        } else {
-          alert("Cannot send verification code");
-        }
+        const username = sessionStorage.getItem("username");
+        const type = "login";
+
+        await fetch(API_ENDPOINTS.audit, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, type })
+        });
       } catch (err) {
-        console.error("Email sending error:", err);
-        alert("Failed to send email");
+        console.error("Audit error:", err);
       }
+       // Redirect
+      window.location.href = "/";
+      // setShowAuth(true);
+      // setUserEmail(data.userEmail);
+      // try {
+      //   const request = await sendEmail(data.userEmail);
+      //   if (request?.Succsess) {
+      //     setEmailCode(request.code);
+      //   } else {
+      //     alert("Cannot send verification code");
+      //   }
+      // } catch (err) {
+      //   console.error("Email sending error:", err);
+      //   alert("Failed to send email");
+      // }
 
     } catch (err) {
       console.error(err);
