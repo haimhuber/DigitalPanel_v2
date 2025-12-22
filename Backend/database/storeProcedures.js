@@ -582,7 +582,7 @@ async function createSp() {
                     CAST(timestamp AS DATE) as consumption_date,
                     MAX(ActiveEnergy) - MIN(ActiveEnergy) as raw_consumption,
                     CASE 
-                        WHEN MAX(ActiveEnergy) - MIN(ActiveEnergy) > 500 THEN 0  -- Filter unrealistic spikes
+                        WHEN MAX(ActiveEnergy) - MIN(ActiveEnergy) > 5000 THEN 0  -- Filter unrealistic spikes
                         ELSE MAX(ActiveEnergy) - MIN(ActiveEnergy)
                     END as daily_consumption,
                     MONTH(CAST(timestamp AS DATE)) as month_num,

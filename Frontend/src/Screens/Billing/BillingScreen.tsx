@@ -278,6 +278,7 @@ export const BillingScreen = () => {
 
       if (result.status === 200 && result.data) {
         // לוג לכל יום שמתקבל
+        console.log('API result:', result);
         result.data.forEach((item: ConsumptionData) => {
          
         });
