@@ -90,6 +90,8 @@ export const Setting = () => {
       const response = await fetch(API_ENDPOINTS.users);
       if (response.ok) {
         const result = await response.json();  
+        console.log({User : result});
+        
         setUsers(result.data || []);
       } else {
         // Fallback until server restart
@@ -325,7 +327,6 @@ export const Setting = () => {
                     <th>ID</th>
                     <th>Username</th>
                     <th>Email</th>
-                    <th>Last Login</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -335,7 +336,6 @@ export const Setting = () => {
                       <td>{user.id}</td>
                       <td>{user.userName}</td>
                       <td>{user.email}</td>
-                      <td className="timestamp-cell">{formatTimestampUTC(user.timestamp)}</td>
                       <td>
                         <button
                           className="control-btn"

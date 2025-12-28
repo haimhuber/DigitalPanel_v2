@@ -713,7 +713,7 @@ async function getUsers() {
   try {
     const pool = await connectDb.connectionToSqlDB();
     const result = await pool.request()
-      .query('SELECT id, username AS userName, email, timestamp FROM Users ORDER BY timestamp DESC');
+      .query('SELECT id, username AS userName, email FROM Users ');
 
     return { status: 200, data: result.recordset };
   } catch (err) {
