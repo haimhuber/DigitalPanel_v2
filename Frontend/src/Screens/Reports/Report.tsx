@@ -206,6 +206,29 @@ const Report = () => {
         headStyles: { fillColor: [255, 105, 0] }
       });
 
+      // Add Alerts/Alarms Table if there are any alerts
+      if (data && data.length > 0) {
+        let lastY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 130;
+        doc.setFontSize(13);
+        doc.setTextColor(227, 30, 36);
+        doc.text('Alerts / Alarms', 20, lastY);
+        doc.setFontSize(10);
+        doc.setTextColor(44, 62, 80);
+        const alertTable = data.slice(0, 20).map((alert) => [
+          alert.id,
+          alert.userName || '',
+          alert.alert_type || '',
+          new Date(alert.timestamp).toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem' })
+        ]);
+        autoTable(doc, {
+          head: [['#', 'Username', 'Type', 'Timestamp']],
+          body: alertTable,
+          startY: lastY + 5,
+          styles: { fontSize: 8 },
+          headStyles: { fillColor: [227, 30, 36] }
+        });
+      }
+
       const fileName = `Switch_Report_${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(fileName);
     } catch (error) {

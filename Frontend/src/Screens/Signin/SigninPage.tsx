@@ -49,7 +49,7 @@ const Signin: React.FC = () => {
         </div>
 
         <form className="login-box" onSubmit={handleSignin}>
-          <h1>Sign In</h1>
+          <h1>Sign Up</h1>
 
           <input
             type="text"

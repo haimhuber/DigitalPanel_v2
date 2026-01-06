@@ -231,7 +231,7 @@ const Login = () => {
               type="button"
               onClick={signin}
             >
-              Signin
+              Signup
             </button>
 
             <button
